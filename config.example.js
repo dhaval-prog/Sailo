@@ -2,7 +2,9 @@
 // config.js is git-ignored so the token stays out of the repo.
 // Use a public "pk." Mapbox token and restrict it to your domains in the Mapbox dashboard.
 // supabaseAnonKey is optional: leave it empty to run in demo mode.
+// supabaseUrl is optional: it defaults to the Sailo project (dfytxscebupuqwehsojc).
 window.SAILO_CONFIG = {
   mapboxToken: 'pk.your-mapbox-public-token',
+  supabaseUrl: '',
   supabaseAnonKey: ''
 };

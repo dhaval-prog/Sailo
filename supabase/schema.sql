@@ -1,4 +1,4 @@
--- Sailo · Supabase schema (run once in the SQL editor of project fdjeafihwwoeqdcnqhjd)
+-- Sailo · Supabase schema (run once in the SQL editor of project dfytxscebupuqwehsojc)
 -- Idempotent: safe to re-run.
 
 create extension if not exists citext;

@@ -1034,7 +1034,7 @@ class Marine{
   for(const g of this.g){const id=g.k+g.seed;if(!MSIGHT[g.k]||this.seen[id]||g.fade<.8)continue;if(Math.hypot(g.x-me.x,g.y-me.y)<g.Rs+260&&g.dep<12){this.seen[id]=1;this.lastToast=t;H.toast(MSIGHT[g.k]);return}}}
 }
 
-const SB_URL='https://fdjeafihwwoeqdcnqhjd.supabase.co';
+const SB_URL=(window.SAILO_CONFIG&&window.SAILO_CONFIG.supabaseUrl)||'https://dfytxscebupuqwehsojc.supabase.co';
 const GENERIC="That email or username and password don't match.";
 const RESERVED=['admin','administrator','sailo','sailoapp','support','help','root','system','moderator','mod','staff','official','owner','api','www','null','undefined','security','team','captain','harbourmaster','everyone'];
 const BADW=['fuck','shit','cunt','nigg','fag','bitch','slut','whore','rape','nazi','porn','dick','pussy'];

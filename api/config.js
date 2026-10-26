@@ -3,6 +3,7 @@
 module.exports = (req, res) => {
   const config = {
     mapboxToken: process.env.MAPBOX_TOKEN || '',
+    supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
   };
   res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
