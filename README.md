@@ -174,7 +174,7 @@ Boats and streaks are **not** client-writable. They live in `user_boats` / `user
 
 ---
 
-## Backend setup (Supabase project `fdjeafihwwoeqdcnqhjd`)
+## Backend setup (Supabase project `dfytxscebupuqwehsojc`)
 1. In the SQL editor, run `supabase/schema.sql`.
 2. Auth → Providers:
    - Enable Email (with **Confirm email** on).
