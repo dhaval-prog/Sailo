@@ -199,5 +199,7 @@ There are no raster assets; everything is drawn on a canvas or with inline SVG i
 ## Running this repo
 - Copy `config.example.js` to `config.js` and put your Mapbox public token in it. `config.js` is git-ignored, so the token never reaches GitHub. Without it the map tiles don't load (the ocean, boats and screens still work).
 - `npm start` serves the app at http://localhost:3000 (`index.html` opens `Living Ocean.dc.html`, keeping any `?query`/`#hash` so Supabase auth redirects still work).
-- Any static host works too (GitHub Pages, Netlify, Vercel): publish the repo root, no build step. Create `config.js` on the host as part of the deploy (for example from an environment variable).
+- Any static host works too: publish the repo root, no build step. Create `config.js` on the host as part of the deploy.
+- **Vercel:** import the repo with Framework Preset "Other" and no build command. Set `MAPBOX_TOKEN` (and optionally `SUPABASE_ANON_KEY`) in Project Settings → Environment Variables, then redeploy. `api/config.js` serves them as `/config.js` (see `vercel.json`).
+- With `SUPABASE_ANON_KEY` set, the app leaves demo mode and uses Supabase, so run the backend setup above first, and add your Vercel domain to Supabase Auth → URL Configuration.
 - The browser needs to reach unpkg.com, cdn.jsdelivr.net, api.mapbox.com, fonts.googleapis.com and api.open-meteo.com.

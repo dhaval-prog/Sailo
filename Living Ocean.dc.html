@@ -1563,7 +1563,7 @@ class Component extends DCLogic {
   marineVals(){const m=this.state.marine||{},on=m.on!==false,set=(k,v)=>this.setState(x=>({marine:{...x.marine,[k]:v}}));const rows=(k,o)=>o.map(n=>({name:n,bg:m[k]===n?'#f4efe6':'transparent',fg:m[k]===n?'#10232c':'#f4efe6',pick:()=>set(k,n)}));
     return{mOn:on,mOnBg:on?'#ff7a59':'rgba(255,255,255,.18)',mOnKnob:on?'18px':'2px',toggleMarine:()=>set('on',!on),mDensRows:rows('dens',['Low','Medium','High']),mVisRows:rows('vis',['Realistic','Enhanced']),mQRows:rows('q',['Low','Medium','High'])}}
 
-  initAuth(){const key=(this.props.supabaseAnonKey||'').trim();let urlErr=null;try{const q=new URLSearchParams(location.search.slice(1)+'&'+location.hash.replace(/^#/,''));const ec=q.get('error_code')||q.get('error');if(ec)urlErr=(ec+' '+(q.get('error_description')||'')).toLowerCase()}catch(e){}
+  initAuth(){const key=(this.props.supabaseAnonKey||(window.SAILO_CONFIG&&window.SAILO_CONFIG.supabaseAnonKey)||'').trim();let urlErr=null;try{const q=new URLSearchParams(location.search.slice(1)+'&'+location.hash.replace(/^#/,''));const ec=q.get('error_code')||q.get('error');if(ec)urlErr=(ec+' '+(q.get('error_description')||'')).toLowerCase()}catch(e){}
     const go=()=>{this.A=key&&window.supabase?realAuth(key,(ev,u)=>this.onAuthEvent(ev,u)):demoAuth();this.restore(urlErr)};
     if(key&&!window.supabase){let n=0;const iv=setInterval(()=>{if(window.supabase||++n>40){clearInterval(iv);go()}},150)}else go()}
   async restore(urlErr){if(urlErr){try{history.replaceState(null,'',location.pathname)}catch(e){}this.setState({authView:'expired',aerr:{form:/expired/.test(urlErr)?'This link has expired.':'This link is no longer valid.'}});return}
