@@ -1,0 +1,10 @@
+{
+  "name": "sailo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sailo: sail. discover. connect.",
+  "scripts": {
+    "start": "npx --yes serve@14.2.4 -l 3000 .",
+    "dev": "npm start"
+  }
+}
