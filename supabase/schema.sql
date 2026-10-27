@@ -283,3 +283,119 @@ grant execute on function public.random_bottles(int) to authenticated;
 revoke execute on function public.bottles_before_insert() from anon, authenticated, public;
 revoke execute on function public.bottle_reported() from anon, authenticated, public;
 revoke execute on function public.handle_new_user() from anon, authenticated, public;
+
+-- ── Ocean discoveries: debris, shipwrecks and seabed finds ───────────────
+-- Object ids are generated identically on every client (from global map cells), so
+-- all sailors share them. Rewards are picked here, never by the client.
+create table if not exists public.ocean_catalog (
+  kind text primary key,
+  rarity text not null,
+  rewards text[] not null,
+  exclusive boolean not null default false
+);
+create table if not exists public.ocean_finds (
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  object_id text not null,
+  kind text not null references public.ocean_catalog(kind),
+  rarity text not null,
+  region text,
+  reward text,
+  created_at timestamptz not null default now(),
+  primary key (user_id, object_id)
+);
+create index if not exists ocean_finds_recent on public.ocean_finds(user_id, created_at desc);
+-- One claim per exclusive object (treasure chests): first sailor wins.
+create table if not exists public.ocean_claims (
+  object_id text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  claimed_at timestamptz not null default now()
+);
+alter table public.ocean_catalog enable row level security;
+alter table public.ocean_finds enable row level security;
+alter table public.ocean_claims enable row level security;
+drop policy if exists "catalog readable" on public.ocean_catalog;
+create policy "catalog readable" on public.ocean_catalog for select to anon, authenticated using (true);
+drop policy if exists "own finds" on public.ocean_finds;
+create policy "own finds" on public.ocean_finds for select to authenticated using (user_id = auth.uid());
+drop policy if exists "claims visible" on public.ocean_claims;
+create policy "claims visible" on public.ocean_claims for select to authenticated using (true);
+-- No insert/update policies: finds and claims are written only by claim_find().
+
+insert into public.ocean_catalog(kind, rarity, rewards, exclusive) values
+('crate','Common',array['mat:timber','mat:nails','mat:canvas','decor:bell','decor:lantern','flag:seaglass'],false),
+('barrel','Common',array['mat:timber','mat:rope','decor:lantern','mat:nails'],false),
+('driftwood','Common',array['mat:timber','mat:nails'],false),
+('planks','Common',array['mat:timber','mat:nails'],false),
+('net','Common',array['mat:rope','mat:canvas'],false),
+('rope','Common',array['mat:rope','mat:canvas'],false),
+('fbuoy','Common',array['mat:rope','mat:timber','mat:canvas'],false),
+('lifebuoy','Uncommon',array['mat:rope','mat:timber','mat:canvas'],false),
+('suitcase','Uncommon',array['decor:compassrose','decor:bell','flag:sunset'],false),
+('mast','Uncommon',array['mat:timber','mat:nails'],false),
+('cargo','Rare',array['mat:nails','decor:compassrose','sail:seafoam'],false),
+('dinghy','Rare',array['mat:rope','mat:timber','mat:canvas'],false),
+('lantern','Rare',array['decor:lantern','flag:sunset'],false),
+('chest','Very rare',array['flag:jolly','flag:aurora','sail:saffron','sail:midnight','sail:rose','flag:sunset'],true),
+('bottle','Uncommon',array['mat:rope','mat:timber','mat:canvas'],false),
+('w_row','Uncommon',array['relic:compass','relic:bell','mat:timber','sail:seafoam'],false),
+('w_fish','Rare',array['relic:compass','relic:bell','mat:timber','sail:seafoam'],false),
+('w_sail','Rare',array['relic:compass','relic:bell','mat:timber','sail:seafoam'],false),
+('w_yacht','Very rare',array['relic:compass','relic:bell','mat:timber','sail:seafoam'],false),
+('w_pirate','Very rare',array['relic:coin','flag:jolly','relic:compass'],false),
+('w_cargo','Very rare',array['relic:compass','relic:bell','mat:timber','sail:seafoam'],false),
+('w_viking','Very rare',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('w_sub','Legendary',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('w_merchant','Legendary',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('w_giant','Legendary',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_anchor','Uncommon',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_chain','Common',array['mat:rope','mat:timber','mat:canvas'],false),
+('u_cannon','Rare',array['relic:coin','flag:jolly','relic:compass'],false),
+('u_prop','Rare',array['mat:rope','mat:timber','mat:canvas'],false),
+('u_wheel','Uncommon',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_pots','Common',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_amphora','Uncommon',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_chest','Very rare',array['flag:jolly','flag:aurora','sail:saffron','sail:midnight','sail:rose','flag:sunset'],true),
+('u_statue','Very rare',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_plane','Legendary',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_nav','Rare',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false),
+('u_ruins','Legendary',array['relic:coin','relic:amphora','relic:figurehead','relic:compass'],false)
+on conflict (kind) do update set rarity = excluded.rarity, rewards = excluded.rewards, exclusive = excluded.exclusive;
+
+create or replace function public.claim_find(p_object text, p_kind text, p_region text default null) returns json
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); cat ocean_catalog; prev text; rw text; owner uuid; n int;
+begin
+  if uid is null then raise exception 'not_authenticated'; end if;
+  if p_object !~ '^[a-z_]+:[A-Za-z0-9_:.-]{1,80}$' or split_part(p_object, ':', 1) <> p_kind then raise exception 'bad_object'; end if;
+  select * into cat from ocean_catalog where kind = p_kind;
+  if not found then raise exception 'unknown_kind'; end if;
+  select reward into prev from ocean_finds where user_id = uid and object_id = p_object;
+  if found then return json_build_object('status', 'already', 'reward', prev); end if;
+  select count(*) into n from ocean_finds where user_id = uid and created_at > now() - interval '1 hour';
+  if n >= 40 then raise exception 'rate_limited'; end if;
+  if cat.exclusive then
+    select count(*) into n from ocean_claims where user_id = uid and claimed_at > now() - interval '1 day';
+    if n >= 3 then raise exception 'rate_limited'; end if;
+    insert into ocean_claims(object_id, user_id) values (p_object, uid) on conflict (object_id) do nothing;
+    select user_id into owner from ocean_claims where object_id = p_object;
+    if owner is distinct from uid then return json_build_object('status', 'taken'); end if;
+  end if;
+  rw := cat.rewards[1 + (abs(hashtext(p_object || uid::text)) % array_length(cat.rewards, 1))];
+  insert into ocean_finds(user_id, object_id, kind, rarity, region, reward)
+    values (uid, p_object, p_kind, cat.rarity, left(coalesce(p_region, ''), 80), rw)
+    on conflict (user_id, object_id) do nothing;
+  if not found then
+    select reward into prev from ocean_finds where user_id = uid and object_id = p_object;
+    return json_build_object('status', 'already', 'reward', prev);
+  end if;
+  return json_build_object('status', 'new', 'reward', rw);
+end $$;
+revoke execute on function public.claim_find(text, text, text) from anon, public;
+grant execute on function public.claim_find(text, text, text) to authenticated;
+
+-- Live updates when someone opens a shared treasure chest.
+do $$ begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'ocean_claims') then
+    alter publication supabase_realtime add table public.ocean_claims;
+  end if;
+end $$;
