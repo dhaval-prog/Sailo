@@ -240,6 +240,8 @@ The voyage module adds the play-and-reward loop on top of the sea. The page call
 - **Fishing.** While anchored, cast, wait for the float to dip, then strike. The catch depends on the climate zone, time of day and your gear, and is recorded in the catch log.
 - **Social.** Sail in a flotilla with a friend, leave notes at sea for others to read, see weekly leaderboards for distance, finds and best streak, and send emotes from the emote wheel. Profiles show a sea log.
 - **World.** Lighthouse beams at night, whales that surface beside slow boats, dolphins that bow-ride more often, festival lanterns, aurora and shooting stars on clear nights.
+- **Your boat menu.** Tap your own boat for a ring of actions: Edit boat, Emotes, Fish (when anchored), Captain's desk and My profile.
+- **Steering to ports.** Choosing a port (Passport, a port card or search) draws a dotted route; steer with the on-screen joystick (or arrow keys / WASD). The boat slides along coastlines and docks when it reaches the port.
 - **Guide and return.** A first-voyage checklist (with a guaranteed crate to find), a "while you were away" gift after six hours or more, and optional evening streak reminders on the device.
 - **Technical.** Graphics setting (Auto, High, Low; Auto starts lower on low-memory devices), a service worker (`sw.js`) that caches the app shell so the sea appears immediately and the app opens offline, and client error reports stored in `client_errors` (plus Sentry if `SENTRY_DSN` is set in Vercel).
 
