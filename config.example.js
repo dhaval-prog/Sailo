@@ -6,5 +6,6 @@
 window.SAILO_CONFIG = {
   mapboxToken: 'pk.your-mapbox-public-token',
   supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseAnonKey: '',
+  sentryDsn: '' // optional: Sentry error tracking
 };

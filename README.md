@@ -229,3 +229,20 @@ A separate module (`window.SailoOcean`) that plugs into the main renderer and re
 - Steam boats (Monsoon, Aurora, Tempest) give off funnel smoke that billows, lightens and drifts with the wind.
 - My Fleet tiles show a live render of each boat with speed and size ratings. Locked boats show as dark silhouettes.
 - Older saves that stored a fleet boat with a base type move onto that boat's design on load (`migMe`).
+
+## Voyages (`sailo-voyage.js`)
+The voyage module adds the play-and-reward loop on top of the sea. The page calls into it through `window.SailoVoyage`.
+- **Ports and passport.** 179 real harbour cities are ports, each with a pier, breakwater and lighthouse. Arriving within about 2 km docks you, stamps your passport and moors a few sailors beside you. Stamping 10 ports unlocks the Navigator flag. Ports also appear in search.
+- **Daily quests.** Three quests each day, picked from the day and your account, reward materials. Finishing all three opens the captain's chest.
+- **Materials and the shipwright.** Timber, rope, canvas and nails from finds and quests pay for four upgrades: racing sails (speed), storm hull (less storm slowdown and drift), night lantern (spot finds farther after dark) and fishing gear.
+- **Weather that matters.** A tailwind speeds you up and a headwind slows you. Storms slow you and push you sideways unless your hull is upgraded. The nav card shows the effect while you sail.
+- **Seasonal events.** Lantern Festival (Oct 15 – Nov 15), Winter Lights (Dec 10 – Jan 25), Spring Regatta (Mar 20 – Apr 25) and Monsoon Season (Jun 15 – Aug 20). Each has its own quest, event tokens and a limited sail or flag.
+- **Fishing.** While anchored, cast, wait for the float to dip, then strike. The catch depends on the climate zone, time of day and your gear, and is recorded in the catch log.
+- **Social.** Sail in a flotilla with a friend, leave notes at sea for others to read, see weekly leaderboards for distance, finds and best streak, and send emotes from the emote wheel. Profiles show a sea log.
+- **World.** Lighthouse beams at night, whales that surface beside slow boats, dolphins that bow-ride more often, festival lanterns, aurora and shooting stars on clear nights.
+- **Guide and return.** A first-voyage checklist (with a guaranteed crate to find), a "while you were away" gift after six hours or more, and optional evening streak reminders on the device.
+- **Technical.** Graphics setting (Auto, High, Low; Auto starts lower on low-memory devices), a service worker (`sw.js`) that caches the app shell so the sea appears immediately and the app opens offline, and client error reports stored in `client_errors` (plus Sentry if `SENTRY_DSN` is set in Vercel).
+
+Backend (in `supabase/schema.sql`, applied to `dfytxscebupuqwehsojc`): `sea_notes`, `note_likes` and `note_reports` (read through `nearby_notes()`, liked through `toggle_note_like()`, hidden after 3 reports, 5 notes per hour); `sail_weeks` with `add_distance()` (client-reported, capped at 5,000 km per call and 200,000 km per week) and `leaderboard()`; `client_errors` (insert-only, rate-limited). Quests, stamps, upgrades and the catch log are stored with the rest of the game state in `user_state`.
+
+Other sailors in the world are demo travellers. Flotillas, moored sailors and leaderboard entries marked "demo" use them.

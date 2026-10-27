@@ -399,3 +399,172 @@ do $$ begin
     alter publication supabase_realtime add table public.ocean_claims;
   end if;
 end $$;
+
+-- ── Notes left at sea ───────────────────────────────────────────────────
+-- gx/gy are global world coordinates (Web Mercator scaled to 8,015,000 units).
+create table if not exists public.sea_notes (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  gx double precision not null check (gx between 0 and 8015000),
+  gy double precision not null check (gy between 0 and 8015000),
+  body text not null check (char_length(btrim(body)) between 1 and 140),
+  author_name text,
+  likes int not null default 0,
+  hidden boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists sea_notes_pos on public.sea_notes(gx, gy) where not hidden;
+create index if not exists sea_notes_user on public.sea_notes(user_id, created_at desc);
+create table if not exists public.note_likes (
+  note_id uuid not null references public.sea_notes(id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  primary key (note_id, user_id)
+);
+create table if not exists public.note_reports (
+  note_id uuid not null references public.sea_notes(id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (note_id, user_id)
+);
+alter table public.sea_notes enable row level security;
+alter table public.note_likes enable row level security;
+alter table public.note_reports enable row level security;
+drop policy if exists "post own notes" on public.sea_notes;
+create policy "post own notes" on public.sea_notes for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "delete own notes" on public.sea_notes;
+create policy "delete own notes" on public.sea_notes for delete to authenticated using (user_id = auth.uid());
+drop policy if exists "report notes" on public.note_reports;
+create policy "report notes" on public.note_reports for insert to authenticated with check (user_id = auth.uid());
+-- Notes are read through nearby_notes(); likes change through toggle_note_like().
+
+create or replace function public.sea_notes_before_insert() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  new.user_id := auth.uid(); new.body := btrim(new.body); new.likes := 0; new.hidden := false; new.created_at := now();
+  select count(*) into n from sea_notes where user_id = new.user_id and created_at > now() - interval '1 hour';
+  if n >= 5 then raise exception 'rate_limited'; end if;
+  select coalesce(nullif(display_name, ''), username::text, 'A sailor') into new.author_name from profiles where id = new.user_id;
+  new.author_name := left(coalesce(new.author_name, 'A sailor'), 40);
+  return new;
+end $$;
+drop trigger if exists sea_notes_before_insert on public.sea_notes;
+create trigger sea_notes_before_insert before insert on public.sea_notes for each row execute function public.sea_notes_before_insert();
+
+create or replace function public.note_reported() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if (select count(*) from note_reports where note_id = new.note_id) >= 3 then update sea_notes set hidden = true where id = new.note_id; end if;
+  return new;
+end $$;
+drop trigger if exists note_reported on public.note_reports;
+create trigger note_reported after insert on public.note_reports for each row execute function public.note_reported();
+
+create or replace function public.nearby_notes(p_gx double precision, p_gy double precision, p_r double precision default 40000)
+returns table(id uuid, gx double precision, gy double precision, body text, author_name text, likes int, created_at timestamptz, liked boolean, mine boolean)
+language sql stable security definer set search_path = public as $$
+  select n.id, n.gx, n.gy, n.body, n.author_name, n.likes, n.created_at,
+         exists(select 1 from note_likes l where l.note_id = n.id and l.user_id = auth.uid()),
+         n.user_id = auth.uid()
+  from sea_notes n
+  where not n.hidden and n.created_at > now() - interval '60 days'
+    and n.gx between p_gx - least(p_r, 100000) and p_gx + least(p_r, 100000)
+    and n.gy between p_gy - least(p_r, 100000) and p_gy + least(p_r, 100000)
+    and not exists (select 1 from note_reports r where r.note_id = n.id and r.user_id = auth.uid())
+  order by n.created_at desc limit 40
+$$;
+
+create or replace function public.toggle_note_like(p_note uuid) returns int
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); c int;
+begin
+  if uid is null then raise exception 'not_authenticated'; end if;
+  if exists (select 1 from note_likes where note_id = p_note and user_id = uid) then
+    delete from note_likes where note_id = p_note and user_id = uid; update sea_notes set likes = greatest(0, likes - 1) where id = p_note returning likes into c;
+  else
+    insert into note_likes(note_id, user_id) values (p_note, uid); update sea_notes set likes = likes + 1 where id = p_note returning likes into c;
+  end if;
+  return coalesce(c, 0);
+end $$;
+
+-- ── Weekly distance and leaderboards ─────────────────────────────────────
+-- Distance is reported by the client, capped per call and per week.
+create table if not exists public.sail_weeks (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  week date not null,
+  km numeric not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, week)
+);
+alter table public.sail_weeks enable row level security;
+drop policy if exists "own weeks" on public.sail_weeks;
+create policy "own weeks" on public.sail_weeks for select to authenticated using (user_id = auth.uid());
+
+create or replace function public.add_distance(p_km numeric) returns numeric
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); wk date := date_trunc('week', now() at time zone 'utc')::date; v numeric;
+begin
+  if uid is null then raise exception 'not_authenticated'; end if;
+  if p_km is null or p_km <= 0 then return 0; end if;
+  insert into sail_weeks(user_id, week, km) values (uid, wk, least(p_km, 5000))
+  on conflict (user_id, week) do update set km = least(200000, sail_weeks.km + least(excluded.km, 5000)), updated_at = now()
+  returning km into v;
+  return v;
+end $$;
+
+create or replace function public.leaderboard(p_kind text) returns table(name text, value numeric, me boolean)
+language sql stable security definer set search_path = public as $$
+  with wk as (select date_trunc('week', now() at time zone 'utc')::date as d),
+  scores as (
+    select s.user_id, s.km as v from sail_weeks s, wk where p_kind = 'km' and s.week = wk.d
+    union all
+    select f.user_id, count(*)::numeric from ocean_finds f, wk where p_kind = 'finds' and f.created_at >= wk.d group by f.user_id
+    union all
+    select u.user_id, u.best::numeric from user_streaks u where p_kind = 'streak' and u.best > 0
+  ),
+  ranked as (select user_id, v, row_number() over (order by v desc) as rk from scores)
+  select left(coalesce(nullif(p.display_name, ''), p.username::text, 'Sailor'), 40), round(r.v, 1), r.user_id = auth.uid()
+  from ranked r left join profiles p on p.id = r.user_id
+  where r.rk <= 20 or r.user_id = auth.uid()
+  order by r.v desc
+$$;
+
+-- ── Client error reports ─────────────────────────────────────────────────
+create table if not exists public.client_errors (
+  id bigint generated always as identity primary key,
+  user_id uuid default auth.uid(),
+  message text check (char_length(message) <= 300),
+  stack text check (char_length(stack) <= 2000),
+  source text check (char_length(source) <= 300),
+  url text check (char_length(url) <= 300),
+  ua text check (char_length(ua) <= 200),
+  created_at timestamptz not null default now()
+);
+create index if not exists client_errors_recent on public.client_errors(created_at desc);
+alter table public.client_errors enable row level security;
+drop policy if exists "report errors" on public.client_errors;
+create policy "report errors" on public.client_errors for insert to anon, authenticated with check (user_id is null or user_id = auth.uid());
+-- No select policy: read them in the dashboard.
+
+create or replace function public.client_errors_limit() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.user_id := auth.uid(); new.created_at := now();
+  if (select count(*) from client_errors where created_at > now() - interval '1 minute') >= 120 then return null; end if;
+  if new.user_id is not null and (select count(*) from client_errors where user_id = new.user_id and created_at > now() - interval '1 hour') >= 30 then return null; end if;
+  return new;
+end $$;
+drop trigger if exists client_errors_limit on public.client_errors;
+create trigger client_errors_limit before insert on public.client_errors for each row execute function public.client_errors_limit();
+
+revoke execute on function public.sea_notes_before_insert() from anon, authenticated, public;
+revoke execute on function public.note_reported() from anon, authenticated, public;
+revoke execute on function public.client_errors_limit() from anon, authenticated, public;
+revoke execute on function public.nearby_notes(double precision, double precision, double precision) from anon, public;
+revoke execute on function public.toggle_note_like(uuid) from anon, public;
+revoke execute on function public.add_distance(numeric) from anon, public;
+revoke execute on function public.leaderboard(text) from anon, public;
+grant execute on function public.nearby_notes(double precision, double precision, double precision) to authenticated;
+grant execute on function public.toggle_note_like(uuid) to authenticated;
+grant execute on function public.add_distance(numeric) to authenticated;
+grant execute on function public.leaderboard(text) to authenticated;
