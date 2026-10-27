@@ -213,3 +213,12 @@ There are no raster assets; everything is drawn on a canvas or with inline SVG i
 - **Colour:** live time and weather by default, a golden-hour welcome screen, warmer dawn and dusk, rarity colours in My Fleet.
 - **Messages in bottles** use the `bottles` and `bottle_reports` tables plus the `random_bottles` RPC (bottom of `supabase/schema.sql`). Without them the app falls back to demo notes.
 - Add `?debug` to the URL to expose the app as `window.__sailo` for testing.
+
+## Ocean discoveries (`ocean-objects.js`)
+A separate module (`window.SailoOcean`) that plugs into the main renderer and reuses its waves, weather, currents, habitat data and camera.
+- **37 kinds** in three groups: floating debris (crates, barrels, driftwood, planks, nets, rope, buoys, lifebuoys, suitcases, masts, containers, dinghies, lanterns, treasure chests), shipwrecks (rowboat to a giant mysterious wreck) and seabed finds (anchors, cannons, amphorae, a sunken aircraft, ruins…).
+- **Shared world:** the ocean is split into ~3.5 km cells in global coordinates; each cell seeds its own objects, so every sailor sees the same wreck at the same place with the same id. Wrecks and seabed finds never move; surface debris drifts on a shared clock and reshuffles every 4 hours. Spawning follows habitat (reef, coast, open, deep) and climate zone, and skips land.
+- **Physics:** floating objects sample the wave field at several points for heave, pitch and roll, with mass-specific damping; barrels and logs roll; light objects drift more with the wind; rain and storms add splashes; storms wash up temporary debris; snow settles on flat tops; fog hides distant objects.
+- **Underwater:** wrecks and finds are drawn beneath the surface with depth-based visibility (cloud, rain, storm, chop), water distortion, sediment, algae and coral; masts and prows of shallow wrecks break the surface; small fish gather around wrecks.
+- **Discovery:** nearby finds get a subtle ring and label; tap to inspect (spinning 3D preview), then Open / Collect / Explore / Salvage, mark the location, or continue sailing. Everything lands in the **Ocean Journal** (menu → Ocean Journal) with stats, marked locations, collection and every kind as a tile.
+- **Rewards:** picked on the server by `claim_find()` (bottom of `supabase/schema.sql`): one reward per object per sailor, treasure chests can only be claimed once worldwide (first sailor wins, synced over Realtime), and claims are rate-limited. Flag and sail rewards can be equipped under Edit boat → Treasure. In demo mode everything is stored on the device.

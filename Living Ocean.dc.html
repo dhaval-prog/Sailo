@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./config.js"></script>
+<script src="./ocean-objects.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -68,6 +69,7 @@
     <button onClick="{{ openFleet }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer;display:flex;flex-direction:column;gap:2px" style-hover="background:rgba(255,255,255,.08)"><span>My Fleet</span><span style="font-size:12px;color:rgba(244,239,230,.66)">{{ fleetCount }} · {{ streakN }} {{ streakWord }}</span></button>
     <button onClick="{{ editBoat }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Edit boat</button>
     <button onClick="{{ openBottleWrite }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Message in a bottle</button>
+    <button onClick="{{ openJournal }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Ocean Journal</button>
     <button onClick="{{ enterPhoto }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Photo mode</button>
     <button onClick="{{ replayIntro }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Replay intro</button>
     <button onClick="{{ doLogout }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Log out</button>
@@ -223,6 +225,12 @@
         <sc-for list="{{ trimOpts }}" as="o" hint-placeholder-count="6">
           <button onClick="{{ o.pick }}" title="{{ o.c }}" style="width:26px;height:26px;border-radius:50%;border:0;background:{{ o.c }};box-shadow:{{ o.ring }};cursor:pointer;padding:0"></button>
         </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hasCos }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:13px;color:rgba(244,239,230,.72);flex:1;min-width:80px">Treasure</span>
+        <sc-for list="{{ cosOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" title="{{ o.name }}" style="height:30px;padding:0 10px 0 5px;border-radius:999px;border:1px solid {{ o.border }};background:{{ o.bg }};color:#f4efe6;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><span style="width:18px;height:18px;border-radius:50%;background:{{ o.col }};box-shadow:0 0 0 1px rgba(255,255,255,.35)"></span>{{ o.name }}</button></sc-for>
       </div>
     </sc-if>
     <div style="display:flex;gap:10px;align-items:center">
@@ -718,6 +726,12 @@
         </div>
       </sc-if>
       <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Time of day</div><div style="font-size:11.5px;color:rgba(244,239,230,.6)">{{ todScope }}</div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ todRows }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.pick }}" style="height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer;flex:none">{{ o.name }}</button></sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Weather</div><div style="font-size:11.5px;color:rgba(244,239,230,.6)">{{ wxScope }}</div></div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <sc-for list="{{ wxRows }}" as="o" hint-placeholder-count="7"><button onClick="{{ o.pick }}" style="height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:{{ o.bg }};color:{{ o.fg }};font-size:13px;cursor:pointer;flex:none">{{ o.name }}</button></sc-for>
@@ -747,6 +761,64 @@
   </div>
 </sc-if>
 <div style="position:absolute;left:50%;bottom:2px;transform:translateX(-50%);z-index:9;font-size:10px;color:rgba(244,239,230,.6);pointer-events:none;white-space:nowrap">© Mapbox © OpenStreetMap</div>
+<sc-if value="{{ showOInsp }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ oClose }}" style="position:absolute;inset:0;z-index:51;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(5,16,24,.45);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);animation:loFade .2s ease">
+    <div onClick="{{ stop }}" style="position:relative;width:min(400px, 100%);max-height:100%;overflow:auto;box-sizing:border-box;background:rgba(10,27,36,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;color:#f4efe6;box-shadow:0 30px 80px rgba(3,14,20,.55);animation:loPop .35s cubic-bezier(.2,.8,.2,1)">
+      <canvas ref="{{ oRef }}" style="width:100%;height:190px;display:block;border-radius:14px;background:radial-gradient(ellipse at 50% 62%, {{ oRarBg }}, rgba(4,24,34,.55) 72%)"></canvas>
+      <button onClick="{{ oClose }}" title="Close" style="position:absolute;top:24px;right:24px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(10,27,36,.6);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="padding:2px 8px;border-radius:999px;background:{{ oRarBg }};color:{{ oRarCol }};font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">{{ oRar }}</span><span style="font-size:12px;color:rgba(244,239,230,.66)">{{ oCat }}</span></div>
+      <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.05">{{ oName }}</div>
+      <div style="font-size:14px;line-height:1.45;color:rgba(244,239,230,.86);text-wrap:pretty">{{ oDesc }}</div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11.5px;color:rgba(244,239,230,.6)">{{ oRegion }}</div>
+      <sc-if value="{{ oDone }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 14px;border-radius:14px;border:1px solid {{ oRarCol }};background:{{ oRarBg }};display:flex;flex-direction:column;gap:4px;animation:loPop .35s cubic-bezier(.2,.8,.2,1)"><span style="font-size:15px;font-weight:600">{{ oResultTitle }}</span><span style="font-size:12.5px;color:rgba(244,239,230,.75);text-wrap:pretty">{{ oResultSub }}</span></div></sc-if>
+      <sc-if value="{{ hasOErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#ff9d80">{{ oErr }}</div></sc-if>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-if value="{{ oCanAct }}" hint-placeholder-val="{{ true }}"><button onClick="{{ oAct }}" style="flex:1 1 120px;height:46px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;font-size:15px;font-weight:600;cursor:pointer;transition:transform .15s" style-active="transform:scale(.97)">{{ oActLabel }}</button></sc-if>
+        <button onClick="{{ oPin }}" style="flex:1 1 120px;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#f4efe6;font-size:14px;font-weight:500;cursor:pointer">{{ oPinLabel }}</button>
+        <sc-if value="{{ oShowJournal }}" hint-placeholder-val="{{ false }}"><button onClick="{{ oJournal }}" style="flex:1 1 120px;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#f4efe6;font-size:14px;font-weight:500;cursor:pointer">Open journal</button></sc-if>
+        <sc-if value="{{ oInWorld }}" hint-placeholder-val="{{ true }}"><button onClick="{{ oClose }}" style="flex:1 1 120px;height:46px;border-radius:12px;border:0;background:transparent;color:rgba(244,239,230,.75);font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Continue sailing</button></sc-if>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ showJournal }}" hint-placeholder-val="{{ false }}">
+  <div style="{{ panelStyle }}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px 10px">
+      <div style="min-width:0">
+        <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#ff9d80">Logbook</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.1">Ocean Journal</div>
+        <div style="font-size:12.5px;color:rgba(244,239,230,.7);margin-top:2px">Wrecks, flotsam and treasure you have found at sea</div>
+      </div>
+      <button onClick="{{ closeJournal }}" title="Close" style="width:34px;height:34px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+    <div style="flex:1;overflow:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ jStats }}" as="st" hint-placeholder-count="3"><div style="padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)"><div style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1">{{ st.n }}</div><div style="font-size:11.5px;color:rgba(244,239,230,.66);margin-top:2px">{{ st.l }}</div></div></sc-for>
+      </div>
+      <sc-if value="{{ jHasPins }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Marked locations</div>
+          <sc-for list="{{ jPins }}" as="pn" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05)"><span style="width:10px;height:10px;border-radius:2px;background:#ff7a59;flex:none"></span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:13.5px">{{ pn.name }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.6)">{{ pn.sub }}</span></span><button onClick="{{ pn.go }}" style="height:30px;padding:0 10px;border-radius:9px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#f4efe6;font-size:12.5px;cursor:pointer">Sail here</button><button onClick="{{ pn.remove }}" title="Remove mark" style="width:30px;height:30px;border-radius:9px;border:0;background:transparent;color:rgba(244,239,230,.6);cursor:pointer;font-size:16px">×</button></div></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ jHasRewards }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Collection</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ jRewards }}" as="rw" hint-placeholder-count="3"><span title="{{ rw.type }}" style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border-radius:999px;background:rgba(255,255,255,.06);font-size:12px"><span style="width:12px;height:12px;border-radius:50%;background:{{ rw.dot }}"></span>{{ rw.name }}</span></sc-for></div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ jSections }}" as="sec" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">{{ sec.label }}</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6)">{{ sec.count }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <sc-for list="{{ sec.tiles }}" as="tl" hint-placeholder-count="6"><button onClick="{{ tl.open }}" style="display:flex;flex-direction:column;gap:4px;padding:6px 6px 8px;border-radius:14px;border:1px solid {{ tl.border }};background:rgba(255,255,255,.04);color:#f4efe6;cursor:pointer;text-align:left;opacity:{{ tl.op }};min-width:0"><img src="{{ tl.img }}" alt="" style="width:100%;aspect-ratio:1;border-radius:10px;background:rgba(4,24,34,.5);display:block"><span style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tl.name }}</span><span style="font-size:10.5px;color:{{ tl.rarCol }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tl.sub }}</span></button></sc-for>
+          </div>
+        </div>
+      </sc-for>
+      <div style="font-size:11.5px;color:rgba(244,239,230,.6);text-wrap:pretty">Floating debris drifts and changes every few hours. Wrecks and seabed finds stay where they are, and every sailor sees them in the same place.</div>
+    </div>
+  </div>
+</sc-if>
 <sc-if value="{{ showBottle }}" hint-placeholder-val="{{ false }}">
   <div onClick="{{ closeBottle }}" style="position:absolute;inset:0;z-index:52;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(5,16,24,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:loFade .25s ease">
     <div onClick="{{ stop }}" style="position:relative;width:min(400px, 100%);box-sizing:border-box;border-radius:20px;padding:26px 24px 20px;background:linear-gradient(170deg,#f7ecd4,#ead6ad);color:#3a2a17;box-shadow:0 30px 80px rgba(3,14,20,.55), inset 0 0 44px rgba(160,120,60,.28);display:flex;flex-direction:column;gap:14px;animation:loPop .45s cubic-bezier(.2,.8,.2,1)">
@@ -1198,6 +1270,10 @@ function realAuth(key,onEvent){const sb=window.supabase.createClient(SB_URL,key,
   async equip(id){const{error}=await sb.rpc('equip_boat',{boat:id});return error?{error:"Couldn't equip that boat."}:{}},
   async bottles(n){const{data,error}=await sb.rpc('random_bottles',{n});if(error)throw error;return(data||[]).map(b=>({id:b.id,body:b.body,author:b.author_name,created:b.created_at}))},
   async throwBottle(body){const{error}=await sb.from('bottles').insert({body});if(error)return{error:/rate_limited/.test(error.message||'')?'You can throw another bottle in a few minutes.':"Couldn't throw your bottle right now."};return{}},
+  async claimFind(id,kind,region){const{data,error}=await sb.rpc('claim_find',{p_object:id,p_kind:kind,p_region:region});if(error)throw error;return data},
+  async loadFinds(){const{data,error}=await sb.from('ocean_finds').select('object_id,kind,rarity,region,reward,created_at').order('created_at',{ascending:false}).limit(1000);if(error)throw error;return data},
+  async oceanClaims(ids){const{data,error}=await sb.from('ocean_claims').select('object_id,user_id').in('object_id',ids.slice(0,100));if(error)throw error;return data},
+  subscribeClaims(cb){const ch=sb.channel('ocean-claims').on('postgres_changes',{event:'INSERT',schema:'public',table:'ocean_claims'},p=>cb(p.new)).subscribe();return ch},
   async reportBottle(id){const{error}=await sb.from('bottle_reports').insert({bottle_id:id});return error&&error.code!=='23505'?{error:"Couldn't send the report."}:{}},
   async reauth(email,pw){const{error}=await sb.auth.signInWithPassword({email,password:pw});return !error},
   async deleteAccount(){const{error}=await sb.functions.invoke('delete-account',{body:{}});if(error)return{error:"Account deletion isn't available yet. Try again later."};await sb.auth.signOut();return{}}}}
@@ -1205,13 +1281,13 @@ const readSave=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}cat
 
 class Component extends DCLogic {
   saved=readSave();
-  state=(()=>{const d=this.saved||{};const on=!!d.onboarded;return{wxMode:d.wxMode||null,wxWind:d.wxWind??null,wxSound:false,sfx:d.sfx!==false,unlockQ:[],phase:'intro',onboarded:on,me:d.me||{name:'',color:'#c89b6a',type:'drifter',boat:'drifter'},sel:null,full:false,chat:null,inbox:false,tab:'messages',viewer:null,likes:d.likes||{},friends:d.friends||{},convos:d.convos||{},unread:d.unread||{},typing:null,vis:d.vis||'everyone',disc:d.disc!==false,visOpen:false,meOpen:false,searchOpen:false,q:'',nearbyOn:false,nearIds:[],nav:{},tod:{label:'',time:''},toast:null,loggedOut:on&&!!d.loggedOut,loggingOut:false,resume:null,blocked:d.blocked||{},mobile:typeof window!=='undefined'&&window.innerWidth<720,draft:'',editing:false,discoverId:null,loc:d.loc||deviceLoc(),locQ:'',camOpen:false,camView:'Angled',editingLoc:false,mLikes:d.mLikes||{},mComments:d.mComments||{},cDraft:'',wx:'',fleet:{owned:['drifter'],streak:0,best:0,last:null,voyages:0,fresh:[],...(d.fleet||{})},fleetOpen:false,authView:'restoring',auth:{user:null,profile:null},af:{},aerr:{},abusy:false,uname:{st:'idle',msg:''},showPw:false,resendAt:0,onb:false,pwOpen:false,notifOpen:false,delOpen:false,notif:{friends:true,messages:true,streak:true,...(d.notif||{})},marine:{on:true,dens:'Medium',vis:'Realistic',q:'Medium',...(d.marine||{})}}})();
-  canvasRef=React.createRef();unlockRef=React.createRef();mapRef=React.createRef();cardRef=React.createRef();msgRef=React.createRef();compassRef=React.createRef();
+  state=(()=>{const d=this.saved||{};const on=!!d.onboarded;return{wxMode:d.wxMode||null,wxWind:d.wxWind??null,wxSound:false,sfx:d.sfx!==false,todMode:d.todMode||null,pins:d.pins||[],cosmetics:[],oinsp:null,journalOpen:false,unlockQ:[],phase:'intro',onboarded:on,me:d.me||{name:'',color:'#c89b6a',type:'drifter',boat:'drifter'},sel:null,full:false,chat:null,inbox:false,tab:'messages',viewer:null,likes:d.likes||{},friends:d.friends||{},convos:d.convos||{},unread:d.unread||{},typing:null,vis:d.vis||'everyone',disc:d.disc!==false,visOpen:false,meOpen:false,searchOpen:false,q:'',nearbyOn:false,nearIds:[],nav:{},tod:{label:'',time:''},toast:null,loggedOut:on&&!!d.loggedOut,loggingOut:false,resume:null,blocked:d.blocked||{},mobile:typeof window!=='undefined'&&window.innerWidth<720,draft:'',editing:false,discoverId:null,loc:d.loc||deviceLoc(),locQ:'',camOpen:false,camView:'Angled',editingLoc:false,mLikes:d.mLikes||{},mComments:d.mComments||{},cDraft:'',wx:'',fleet:{owned:['drifter'],streak:0,best:0,last:null,voyages:0,fresh:[],...(d.fleet||{})},fleetOpen:false,authView:'restoring',auth:{user:null,profile:null},af:{},aerr:{},abusy:false,uname:{st:'idle',msg:''},showPw:false,resendAt:0,onb:false,pwOpen:false,notifOpen:false,delOpen:false,notif:{friends:true,messages:true,streak:true,...(d.notif||{})},marine:{on:true,dens:'Medium',vis:'Realistic',q:'Medium',...(d.marine||{})}}})();
+  canvasRef=React.createRef();unlockRef=React.createRef();oRef=React.createRef();mapRef=React.createRef();cardRef=React.createRef();msgRef=React.createRef();compassRef=React.createRef();
   mbCache={};t=0;wind=0.5;cam={x:W/2,y:H/2,z:0.3,r:0,p:.7};camT={x:W/2,y:H/2,z:0.3,r:0,p:.7};camK=3;follow=null;nearKey='';
 
   componentDidMount(){try{if(/[?&]debug\b/.test(location.search))window.__sailo=this}catch(e){}this.streakT=setTimeout(()=>{const s=this.state,f=s.fleet;if(!s.authView&&s.onboarded&&!s.loggedOut&&f.last!==dayKey(0)&&f.last===dayKey(-1))this.toast('Finish a voyage today to keep your '+f.streak+'-day streak.')},9000);this.authIv=setInterval(()=>{if(this.state.authView==='verify')this.forceUpdate()},1000);setTimeout(()=>this.initAuth(),0);
     {const d=this.saved;const L=this.state.loc;this.startG=d&&d.pos&&d.pos.every(Number.isFinite)?[d.pos[0],d.pos[1]]:ll2w(L.lon,L.lat)}
-    this.build();this.initMap();
+    this.build();this.initMap();try{this.ocean=window.SailoOcean?new window.SailoOcean(this):null}catch(e){console.warn('ocean init',e)}
     const cv=this.canvasRef.current;this.canvas=cv;this.ctx=cv.getContext('2d');
     this.onResize=()=>{const r=cv.getBoundingClientRect();this.vw=r.width;this.vh=r.height;this.minZ=this.vw/WM*1.2;if(this.map)this.map.resize();this.dpr=Math.min([2,1.5,1][this.q||0],window.devicePixelRatio||1);cv.width=Math.round(this.vw*this.dpr);cv.height=Math.round(this.vh*this.dpr);const m=this.vw<720;if(m!==this.state.mobile)this.setState({mobile:m})};
     window.addEventListener('resize',this.onResize);this.onResize();
@@ -1336,14 +1412,14 @@ class Component extends DCLogic {
     this.glow=sprite('rgba(255,196,120,1)',64);this.shade=sprite('rgba(4,24,34,1)',128);this.bio=sprite('rgba(120,240,220,1)',32)}
   arrived(b){if(b.me){this.addVoyage();this.celebrate();if(this.buoy)this.buoy.fade=this.t;const isl=b.dest&&b.dest.isl&&this.islands.find(i=>i.id===b.dest.isl);b.at=isl?isl.name:'open water';this.toast(`Anchored ${isl?'off '+isl.name:'in open water'}.`);b.dest=null}else{b.at=b.dest&&b.dest.name!=='Open water'?b.dest.name:null;b.dest=null;b.timer=6+Math.random()*16}}
 
-  tick=(now)=>{const raw=(now-this.last)/1000,dt=Math.min(0.05,raw);this.last=now;this.t+=dt;this.dtNow=dt;this.qPerf(raw);try{this.update(dt);this.draw();this.placeCard();if(this.state.unlockQ&&this.state.unlockQ.length)this.drawUnlock();const ce=this.compassRef.current;if(ce)ce.style.transform=`rotate(${-this.cam.r}rad)`}catch(e){console.error(e)}this.raf=requestAnimationFrame(this.tick)};
+  tick=(now)=>{const raw=(now-this.last)/1000,dt=Math.min(0.05,raw);this.last=now;this.t+=dt;this.dtNow=dt;this.qPerf(raw);try{this.update(dt);this.draw();this.placeCard();if(this.state.unlockQ&&this.state.unlockQ.length)this.drawUnlock();if(this.state.oinsp&&this.ocean&&this.oRef.current)try{this.ocean.drawPreview(this.oRef.current,this.state.oinsp.kind,this.t)}catch(e){}const ce=this.compassRef.current;if(ce)ce.style.transform=`rotate(${-this.cam.r}rad)`}catch(e){console.error(e)}this.raf=requestAnimationFrame(this.tick)};
   update(dt){const sm=this.props.sailSpeed??60;const me=this.boatsById.me;if(Math.abs(me.x)>150000||Math.abs(me.y)>150000){this.rebasing=true;this.build();this.rebasing=false}
     for(const b of this.boats){if(b.me){b.type=this.state.me.type;b.color=this.state.me.color}this.step(b,dt,b.me?sm:sm*.8);if(!b.me&&b.presence==='online'&&b.state==='anchored'){b.timer-=dt;if(b.timer<=0)this.wander(b)}}
     if(this.bioP&&this.bioP.length){for(const p of this.bioP)p.a+=dt;this.bioP=this.bioP.filter(p=>p.a<p.l)}
     if(this.goldP&&this.goldP.length){for(const p of this.goldP)p.a+=dt;this.goldP=this.goldP.filter(p=>p.a<p.l)}
     if(this.rings&&this.rings.length){for(const r of this.rings)r.a+=dt;this.rings=this.rings.filter(r=>r.a<r.l)}
     if(this.pm)this.meSpd=Math.min(400,Math.hypot(me.x-this.pm[0],me.y-this.pm[1])/Math.max(dt,1e-3));this.pm=[me.x,me.y];
-    this.funStep(dt);
+    this.funStep(dt);if(this.ocean)try{this.ocean.update(dt)}catch(e){if(!this.oErr){this.oErr=1;console.warn('ocean',e)}}
     this.wxUpdate(dt);for(const b of this.boats)this.boatWave(b,dt);if(!this.marine)this.marine=new Marine(this);try{this.marine.update(dt)}catch(e){if(!this.mErr){this.mErr=1;console.warn('marine',e)}}
     if(this.follow){const b=this.boatsById[this.follow];if(b){let o=[0,0];if(!b.me&&this.state.sel===b.id&&!this.state.full)o=this.state.mobile?this.scr2w(0,this.vh*.22,this.camT.z):this.scr2w(this.vw*.13,0,this.camT.z);this.camT.x=b.x+o[0];this.camT.y=b.y+o[1]}}
     const k=1-Math.exp(-dt*this.camK);this.cam.x+=(this.camT.x-this.cam.x)*k;this.cam.y+=(this.camT.y-this.cam.y)*k;this.cam.r+=ang(this.camT.r-this.cam.r)*k;this.cam.p+=(this.camT.p-this.cam.p)*k;this.cam.z=Math.exp(Math.log(this.cam.z)+(Math.log(this.camT.z)-Math.log(this.cam.z))*k);
@@ -1362,7 +1438,7 @@ class Component extends DCLogic {
     const damp=Math.exp(-dt*0.9);for(const w of b.wake){w.a+=dt;w.x+=w.vx*dt;w.y+=w.vy*dt;w.vx*=damp;w.vy*=damp}for(const p of b.trail)p.a+=dt;
     while(b.wake.length&&b.wake[0].a>=b.wake[0].l)b.wake.shift();while(b.trail.length&&b.trail[0].a>1.9)b.trail.shift()}
 
-  sky(){const mode=this.props.timeOfDay||'Real time',av=this.state.authView,intro=av==='welcome'||av==='restoring';let p=this.todOverride!=null?this.todOverride:intro?.715:mode==='Real time'?(this.realP??.5):mode==='Cycle'?(0.36+this.t/(this.props.cycleSeconds||240))%1:({Morning:.3,Noon:.5,Dusk:.73,Night:.94}[mode]??.5);
+  sky(){const mode=this.state.todMode||this.props.timeOfDay||'Real time',av=this.state.authView,intro=av==='welcome'||av==='restoring';let p=this.todOverride!=null?this.todOverride:intro?.715:mode==='Real time'?(this.realP??.5):mode==='Cycle'?(0.36+this.t/(this.props.cycleSeconds||240))%1:({Morning:.3,Noon:.5,Dusk:.73,Night:.94}[mode]??.5);
     if(this.skyP==null||this.skySnap){this.skyP=p;this.skySnap=false}else if(Math.abs(p-this.skyP)>1e-4){let d=p-this.skyP;if(d>.5)d-=1;if(d<-.5)d+=1;this.skyP=((this.skyP+d*Math.min(1,(this.dtNow||.016)*1.2))%1+1)%1}p=this.skyP;let i=0;while(i<SKY.length-2&&SKY[i+1][0]<=p)i++;const a=SKY[i],b=SKY[i+1],f=(p-a[0])/((b[0]-a[0])||1);const ca=hex(a[1]),cb=hex(b[1]);
     return{p,col:`rgb(${ca.map((v,k)=>Math.round(v+(cb[k]-v)*f)).join(',')})`,a:a[2]+(b[2]-a[2])*f,night:a[3]+(b[3]-a[3])*f}}
   toScreen(x,y){const c=this.cam,cs=Math.cos(c.r),sn=Math.sin(c.r),dx=x-c.x,dy=y-c.y;return{x:this.vw/2+(dx*cs+dy*sn)*c.z,y:this.vh/2+(-dx*sn+dy*cs)*c.z}}
@@ -1381,13 +1457,13 @@ class Component extends DCLogic {
     c.lineJoin='round';c.lineCap='round';
     for(const[col,lw,al]of((this.q||0)?[['#2fb3c0',130,.6],['#8ff0e0',22,.8]]:[['#2a9fb4',170,.45],['#33bfc6',95,.6],['#4fd6d2',48,.75],['#8cefe0',16,.85]])){c.globalAlpha=al;c.strokeStyle=col;c.lineWidth=lw;c.stroke(this.allLand)}
     this.drawCaustics(c,z,t,night);
-    if(this.marine)try{this.marine.draw(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.mErr2){this.mErr2=1;console.warn('marine draw',e)}}this.drawGlints(c,x0,y0,x1,y1,z,t,night);this.drawSunPath(c,S);this.drawWaves(c,x0,y0,x1,y1,z,t,night);this.drawWhitecaps(c,x0,y0,x1,y1,z,t,night);this.drawRipples(c,z,night);this.drawRings(c,z,night);
+    if(this.marine)try{this.marine.draw(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.mErr2){this.mErr2=1;console.warn('marine draw',e)}}if(this.ocean)try{this.ocean.drawUnder(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.oErr1){this.oErr1=1;console.warn('ocean under',e)}}this.drawGlints(c,x0,y0,x1,y1,z,t,night);this.drawSunPath(c,S);this.drawWaves(c,x0,y0,x1,y1,z,t,night);this.drawWhitecaps(c,x0,y0,x1,y1,z,t,night);this.drawRipples(c,z,night);this.drawRings(c,z,night);
     {const sa=this.env.sea,q=this.q||0;if(q>=2){c.globalAlpha=Math.min(.7,.35+sa*.1);c.strokeStyle='#ffffff';c.lineWidth=3+sa*2;c.stroke(this.allLand)}else{c.globalAlpha=Math.min(.92,.5+sa*.14);c.strokeStyle='#ffffff';c.lineWidth=3+sa*1.6;c.setLineDash([9,Math.max(6,15-sa*3)]);c.lineDashOffset=-t*7*(1+sa*.7);c.stroke(this.allLand);c.globalAlpha=Math.min(.6,.22+sa*.12);c.lineWidth=10+sa*12;c.setLineDash([22,30]);c.lineDashOffset=t*5*(1+sa*.9);if(!q)c.stroke(this.allLand)}}c.setLineDash([]);
       if(this.islands.length)for(let j=0,sa=this.env.sea;j<((this.q||0)>=2?1:2);j++){const ph=(t*(.18+sa*.03)+j*.5)%1;c.globalAlpha=(1-ph)*(1-ph)*Math.min(.7,.42+sa*.1)*(1-night*.35);c.strokeStyle='#ffffff';c.lineWidth=5+ph*(26+sa*10);c.stroke(this.allLand)}c.globalAlpha=1;
     const sb=Math.min(4000,Math.max(1,0.5/z));this.sbNow=sb;
     for(const b of this.boats)if(!this.state.blocked[b.id])this.drawWake(c,b,sb,'#ffffff',1);
     if(this.goldP&&this.goldP.length){c.save();c.globalCompositeOperation='lighter';if(!this.goldS)this.goldS=sprite('rgba(255,214,120,1)',32);for(const p of this.goldP){const k=p.a/p.l,tw=.5+.5*Math.sin(t*12+p.f);c.globalAlpha=(1-k)*tw;const r=p.r*sb*3;c.drawImage(this.goldS,p.x-r,p.y-r,r*2,r*2)}c.restore()}
-    this.drawBuoy(c,t,sb,night);this.drawBottles(c,t,sb,night);if(this.marine)try{this.marine.drawSurface(c,z,t)}catch(e){}
+    this.drawBuoy(c,t,sb,night);this.drawBottles(c,t,sb,night);if(this.ocean)try{this.ocean.drawSurface(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.oErr2){this.oErr2=1;console.warn('ocean draw',e)}}if(this.marine)try{this.marine.drawSurface(c,z,t)}catch(e){}
     for(const isl of this.islands)for(const p of isl.parts){if(p.x+p.R*1.5<x0||p.x-p.R*1.5>x1||p.y+p.R*1.5<y0||p.y-p.R*1.5>y1)continue;
       if(!p.deco)p.deco=this.mkDeco(p,isl);this.drawWeeds(c,p,t,z,night);this.drawRocks(c,p,E,true);c.save();c.translate(3,6);c.globalAlpha=.3;c.fillStyle='#0b4352';c.fill(p.sand);c.restore();c.globalAlpha=1;
       c.strokeStyle=isl.rocky?'#8f887b':'#d4a965';c.lineWidth=6;c.stroke(p.sand);c.fillStyle=isl.rocky?'#958e81':'#d2a865';c.fill(p.sand);c.save();c.translate(E.x*2.5,E.y*2.5);c.fillStyle=isl.rocky?'#b9b2a3':'#f1d496';c.fill(p.sand);if(!p.deco.dune)p.deco.dune=poly(p.x-p.R*.03,p.y-p.R*.04,p.R,p.f,.8,0);c.translate(E.x*1.8,E.y*1.8);c.globalAlpha=.8;c.fillStyle=isl.rocky?'#c6c0b2':'#fae6b8';c.fill(p.deco.dune);c.globalAlpha=1;c.restore();
@@ -1411,6 +1487,7 @@ class Component extends DCLogic {
           const dk=pt(-Lb*.1,0,zH);c.globalAlpha=night*.55;c.drawImage(this.glow,dk[0]-16*sb,dk[1]-16*sb,32*sb,32*sb)}}
       if(night>.25){const nk=Math.min(1,(night-.25)/.5);if(this.bioP)for(const p of this.bioP){const k=p.a/p.l,fl=.55+.45*Math.sin(t*9+p.f);c.globalAlpha=nk*(1-k)*fl*.95;const r=p.r*sb*(1+k*.7)*2.4;c.drawImage(this.bio,p.x-r,p.y-r,r*2,r*2)}
         for(const g of this.glowPts){c.globalAlpha=Math.min(1,g[3]*nk);c.drawImage(this.bio,g[0]-g[2],g[1]-g[2],g[2]*2,g[2]*2)}}
+      if(this.ocean)try{this.ocean.drawGlow(c,night)}catch(e){}
       c.globalCompositeOperation='source-over'}
     c.globalAlpha=1;
     if(me.state==='sailing'&&me.path.length&&!this.state.photo){c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=2/z;c.setLineDash([6/z,9/z]);c.lineDashOffset=-t*24/z;c.beginPath();c.moveTo(me.x,me.y);for(let k=me.pi;k<me.path.length;k++)c.lineTo(me.path[k][0],me.path[k][1]);c.stroke();c.setLineDash([])}
@@ -1430,7 +1507,7 @@ class Component extends DCLogic {
         c.fillStyle='#ffffff';c.strokeStyle='#10232c';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,3.6,0,6.283);c.fill();c.stroke();
         c.font='500 12px Geist, sans-serif';const dx=l.x-p.x;c.textAlign=dx>12?'left':dx<-12?'right':'center';const w=c.measureText(ct.name).width+12;const bx=c.textAlign==='left'?l.x:c.textAlign==='right'?l.x-w:l.x-w/2;
         c.fillStyle='rgba(10,27,36,.72)';c.beginPath();c.roundRect(bx,l.y-10,w,20,10);c.fill();c.fillStyle='#f4efe6';c.fillText(ct.name,c.textAlign==='left'?l.x+6:c.textAlign==='right'?l.x-6:l.x,l.y+.5)}}c.globalAlpha=1}
-    this.drawBubbles(c,sorted,z,t,sb);
+    this.drawBubbles(c,sorted,z,t,sb);if(this.ocean&&!this.state.photo)try{this.ocean.drawHud(c,t)}catch(e){}
   }
   golden(p){const b=(c,w)=>Math.max(0,1-Math.abs(p-c)/w);return Math.min(1,Math.max(b(.275,.075),b(.725,.085)))}
   drawSwell(c,x0,y0,x1,y1,z,t,night){const q=this.q||0;if(q>=2||!this.wcA||!this.env)return;const e=this.env;
@@ -1562,14 +1639,14 @@ class Component extends DCLogic {
     for(const {m} of order){c.strokeStyle='#3f2716';c.lineWidth=1.8*s;c.beginPath();c.moveTo(...P(m.x,0,Hh));c.lineTo(...P(m.x,0,Hh+m.h));c.stroke();
       for(const sl of sails){if(sl.m!==m)continue;const a=P(...yard(m,sl.zt,sl.hw,-1)),b2=P(...yard(m,sl.zt,sl.hw,1)),d=P(...yard(m,sl.zb,sl.hw*1.04,1)),e=P(...yard(m,sl.zb,sl.hw*1.04,-1));
         const ct=P(...yard(m,sl.zt,0,1,sl.hw*.12*bil)),cb=P(...yard(m,sl.zb,0,1,sl.hw*.55*bil));
-        c.fillStyle='#f5f0e4';c.beginPath();c.moveTo(...a);c.quadraticCurveTo(...ct,...b2);c.lineTo(...d);c.quadraticCurveTo(...cb,...e);c.closePath();c.fill();
+        c.fillStyle=b.me&&this.state.me.sail?this.state.me.sail:'#f5f0e4';c.beginPath();c.moveTo(...a);c.quadraticCurveTo(...ct,...b2);c.lineTo(...d);c.quadraticCurveTo(...cb,...e);c.closePath();c.fill();
         if(rk>=1){const zs=sl.zt+(sl.zb-sl.zt)*.72,p1=P(...yard(m,zs,sl.hw*1.02,-1,sl.hw*.38*bil)),p2=P(...yard(m,zs,sl.hw*1.02,1,sl.hw*.38*bil)),pc=P(...yard(m,zs,0,1,sl.hw*.45*bil));c.strokeStyle=RARC[rar];c.lineWidth=1.5*s;c.beginPath();c.moveTo(...p1);c.quadraticCurveTo(...pc,...p2);c.stroke()}
         c.fillStyle='rgba(120,100,80,.16)';c.beginPath();const mt=P(...yard(m,(sl.zt+sl.zb)/2,sl.hw,-1)),mb=P(...yard(m,(sl.zt+sl.zb)/2,sl.hw,1));c.moveTo(...mt);c.lineTo(...mb);c.lineTo(...d);c.quadraticCurveTo(...cb,...e);c.closePath();c.fill();
         c.strokeStyle='#5a3a22';c.lineWidth=1.2*s;c.beginPath();c.moveTo(...a);c.lineTo(...b2);c.stroke()}}
     const tm=masts.length?masts.reduce((a,b2)=>a.h>b2.h?a:b2):{x:-L*.4,h:Hh*2.8};if(!masts.length){c.strokeStyle='#4a2e1b';c.lineWidth=.9*s;c.beginPath();c.moveTo(...P(tm.x,0,Hh));c.lineTo(...P(tm.x,0,Hh+tm.h));c.stroke()}
     {const top=P(tm.x,0,Hh+tm.h),ws=Math.min(1.6,.35+(this.env?this.env.w:12)/30),fl=L*(masts.length?.3:.22)*(.7+.3*Math.min(1,ws)),wx=Math.cos(this.wind),wy=Math.sin(this.wind),N=7,up=[],dn=[],fw=(masts.length?4.2:3.4)*s;
       for(let i=0;i<=N;i++){const u=i/N,off=Math.sin(t*(5+ws*5)-u*5.5+b.ph)*fl*.13*u*(.4+ws*.6),bx=top[0]+wx*fl*u-wy*off,by=top[1]+wy*fl*u+wx*off,hw=fw*(1-u*(rk>=2?.15:.8));up.push([bx,by]);dn.push([bx-E.x*hw,by-E.y*hw])}
-      c.fillStyle=rk>=2?RARC[rar]:b.color;c.beginPath();c.moveTo(...up[0]);for(const p of up)c.lineTo(...p);for(let i=dn.length-1;i>=0;i--)c.lineTo(...dn[i]);c.closePath();c.fill();c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.45*s;c.stroke()}
+      c.fillStyle=b.me&&this.state.me.flag?this.state.me.flag:rk>=2?RARC[rar]:b.color;c.beginPath();c.moveTo(...up[0]);for(const p of up)c.lineTo(...p);for(let i=dn.length-1;i>=0;i--)c.lineTo(...dn[i]);c.closePath();c.fill();c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.45*s;c.stroke()}
     if(this.env.rain>.15&&s<3){c.fillStyle='#ffffff';const n=Math.round(this.env.rain*6),q=Math.floor(t*14);for(let k=0;k<n;k++){const h1=Math.sin((q+k*7.13)*12.9898+b.ph*78.2)*43758.5453,h2=Math.sin((q+k*3.7)*4.1414+b.ph*9.1)*24634.6345;const pt=P((h1-Math.floor(h1)-.5)*L*.8,(h2-Math.floor(h2)-.5)*w*1.6,Hh);c.globalAlpha=base*.75;c.beginPath();c.arc(pt[0],pt[1],.9*s,0,6.283);c.fill()}}
     c.globalAlpha=base}
   drawBubbles(c,boats,z,t,sb){const st=this.state;this.screenPos={};if(st.photo){for(const b of boats){const s=this.toScreen(b.x,b.y);this.screenPos[b.id]={x:s.x,y:s.y}}return}c.textAlign='center';c.textBaseline='middle';
@@ -1609,16 +1686,16 @@ class Component extends DCLogic {
   hover(p){const b=this.hitBoat(p.x,p.y);this.canvas.style.cursor=b?'pointer':'grab'}
   zoomAt(sx,sy,nz,now){nz=Math.max(this.minZ||.03,Math.min(3.4,nz));if(!this.follow){const w=this.toWorld(sx,sy);const v=this.scr2w(sx-this.vw/2,sy-this.vh/2,nz);this.camT.x=w.x-v[0];this.camT.y=w.y-v[1];}this.camT.z=nz;if(now){this.cam.z=nz;if(!this.follow){this.cam.x=this.camT.x;this.cam.y=this.camT.y}}}
   hitBoat(sx,sy){if(!this.screenPos)return null;let best=null,bd=26;for(const id in this.screenPos){const p=this.screenPos[id];let d=Math.hypot(p.x-sx,p.y-sy);if(p.by!=null)d=Math.min(d,Math.hypot(p.bx-sx,p.by-sy),Math.hypot(p.x-sx,(p.y+p.by)/2-sy));if(d<bd){bd=d;best=this.boatsById[id]}}return best}
-  tap(sx,sy){const st=this.state;if(st.phase==='intro'||st.loggedOut||st.photo)return;const bh=(this.bottles||[]).find(b=>!b.mine&&b.sx!=null&&Math.hypot(b.sx-sx,b.sy-sy)<28);if(bh){this.openBottle(bh);return}const hit=this.hitBoat(sx,sy);
+  tap(sx,sy){const st=this.state;if(st.phase==='intro'||st.loggedOut||st.photo)return;if(this.ocean&&!st.journalOpen){const ob=this.ocean.hit(sx,sy);if(ob){this.ocean.open(ob);return}}const bh=(this.bottles||[]).find(b=>!b.mine&&b.sx!=null&&Math.hypot(b.sx-sx,b.sy-sy)<28);if(bh){this.openBottle(bh);return}const hit=this.hitBoat(sx,sy);
     if(hit){if(hit.me){this.myBoat();return}this.select(hit.id);return}
-    if(st.sel||st.visOpen||st.meOpen||st.searchOpen||st.camOpen||st.fleetOpen){this.setState({sel:null,full:false,visOpen:false,meOpen:false,searchOpen:false,camOpen:false,fleetOpen:false});if(this.follow!=='me')this.follow=null;return}
+    if(st.sel||st.visOpen||st.meOpen||st.searchOpen||st.camOpen||st.fleetOpen||st.journalOpen){this.setState({sel:null,full:false,visOpen:false,meOpen:false,searchOpen:false,camOpen:false,fleetOpen:false,journalOpen:false});if(this.follow!=='me')this.follow=null;return}
     if(st.phase==='customize'||st.phase==='locate')return;const w=this.toWorld(sx,sy);this.audioCtx(this.state.sfx!==false);(this.rings||(this.rings=[])).push({x:w.x,y:w.y,a:0,l:1,r:34*(this.sbNow||1)});if(this.marine)this.marine.poke(w.x,w.y,140*(this.sbNow||1));this.setDest(w.x,w.y)}
   select(id){const patch={sel:id,full:false,searchOpen:false,visOpen:false,meOpen:false};if(this.state.phase==='discover'||this.state.phase==='sailing'||this.state.phase==='firstDest'){Object.assign(patch,{phase:'free',onboarded:true});setTimeout(()=>this.toast('That’s the whole idea. The ocean is yours — fair winds.'),1800);this.scheduleRequest()}
     this.setState(patch);this.follow=id;this.camT.z=Math.max(this.camT.z,1.25)}
   myBoat=()=>{this.follow='me';this.camT.z=Math.max(this.camT.z,1.3)};
   scheduleRequest(){if(this.reqT||this.state.friends.tomas)return;this.reqT=setTimeout(()=>{if(!this.state.friends.tomas){this.setState(s=>({friends:{...s.friends,tomas:'incoming'}}));this.toast('Tomas Vidal sent you a friend request.',{label:'View',fn:()=>this.setState({inbox:true,tab:'requests',chat:null,full:false})})}},25000)}
   toast(text,action){clearTimeout(this.toastT);this.setState({toast:{text,action}});this.toastT=setTimeout(()=>this.setState({toast:null}),action?6000:3600)}
-  escape(){const s=this.state;if(s.shot){this.setState({shot:null});return}if(s.photo){this.todOverride=null;this.setState({photo:false,photoTod:null});return}if(s.bottle){this.setState({bottle:null});return}if(s.unlockQ&&s.unlockQ.length){this.setState({unlockQ:s.unlockQ.slice(1)});return}if(s.viewer)this.closeViewer();else if(s.chat)this.setState({chat:null});else if(s.inbox)this.setState({inbox:false});else if(s.full)this.setState({full:false});else if(s.sel){this.setState({sel:null});this.follow=null}else this.setState({visOpen:false,meOpen:false,searchOpen:false,camOpen:false})}
+  escape(){const s=this.state;if(s.oinsp){this.setState({oinsp:null});return}if(s.journalOpen){this.setState({journalOpen:false});return}if(s.shot){this.setState({shot:null});return}if(s.photo){this.todOverride=null;this.setState({photo:false,photoTod:null});return}if(s.bottle){this.setState({bottle:null});return}if(s.unlockQ&&s.unlockQ.length){this.setState({unlockQ:s.unlockQ.slice(1)});return}if(s.viewer)this.closeViewer();else if(s.chat)this.setState({chat:null});else if(s.inbox)this.setState({inbox:false});else if(s.full)this.setState({full:false});else if(s.sel){this.setState({sel:null});this.follow=null}else this.setState({visOpen:false,meOpen:false,searchOpen:false,camOpen:false})}
 
   wxInit(){const R=rng(77);this.env={cloud:20,wind:12,w:12,dir:this.wind,gust:.2,rain:0,snow:0,fog:0,storm:0,cold:0,sea:.4,chop:.15,foam:0,swell:.7,swDir:this.wind+.35,cur:.15,curDir:this.wind+1.2,acc:0,birds:1};this.envT={...this.env};
     this.wpts=[];for(let i=0;i<84;i++)this.wpts.push({x:R(),y:R(),c:i%4,h:R(),l:R()});
@@ -1757,7 +1834,7 @@ class Component extends DCLogic {
     for(let i=0;i<8;i++){const a=me.h+(Math.random()-.5)*2.4,d=(130+Math.random()*150)*sb,x=me.x+Math.cos(a)*d,y=me.y+Math.sin(a)*d;if(this.isLand(x,y)||(this.marine&&this.marine.isWater(x,y)===false))continue;(this.bottles||(this.bottles=[])).push({x,y,h:Math.random()*6.28,ph:Math.random()*6.28,msg,age:0,fa:0});
       let hinted=false;try{hinted=!!localStorage.getItem('sailo.bottleHint');localStorage.setItem('sailo.bottleHint','1')}catch(e){}if(!hinted)setTimeout(()=>this.toast('A bottle is drifting nearby. Tap it to read the message inside.'),600);return}
     pool.unshift(msg)}
-  openBottle(b){this.bottles=this.bottles.filter(x=>x!==b);(this.readB||(this.readB={}))[b.msg.id]=1;this.sfx('cork');this.vib(15);this.setState({bottle:{mode:'read',msg:b.msg},sel:null,meOpen:false})}
+  openBottle(b){this.bottles=this.bottles.filter(x=>x!==b);if(this.ocean)try{this.ocean.recordBottle(b.msg)}catch(e){}(this.readB||(this.readB={}))[b.msg.id]=1;this.sfx('cork');this.vib(15);this.setState({bottle:{mode:'read',msg:b.msg},sel:null,meOpen:false})}
   async throwBottle(){const b=this.state.bottle,txt=((b&&b.draft)||'').trim();if(!txt||(b&&b.busy))return;const low=txt.toLowerCase();if(BADW.some(w=>low.includes(w))){this.setState(x=>({bottle:{...x.bottle,err:'Keep it kind — try different words.'}}));return}
     let last=this.lastThrow||0;try{last=Math.max(last,+localStorage.getItem('sailo.lastThrow')||0)}catch(e){}const wait=last+300000-Date.now();if(wait>0){this.setState(x=>({bottle:{...x.bottle,err:'You can throw another bottle in '+Math.ceil(wait/60000)+' min.'}}));return}
     this.setState(x=>({bottle:{...x.bottle,busy:true,err:null}}));let r={};try{r=await this.A.throwBottle(txt)}catch(e){r={error:"Couldn't throw your bottle right now."}}
@@ -1788,6 +1865,10 @@ class Component extends DCLogic {
     const meta=[this.boatName(this.boatsById.me),L.name||'',new Date().toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})].filter(Boolean).join(' · ');o.textAlign='right';o.fillStyle='rgba(27,42,51,.72)';o.font='italic '+Math.round(cap*.24)+'px "Instrument Serif", serif';o.fillText(meta,out.width-pad,cy-(this.mapReady?cap*.1:0));
     if(this.mapReady){o.font=Math.round(cap*.12)+'px Geist, sans-serif';o.fillStyle='rgba(27,42,51,.5)';o.fillText('© Mapbox © OpenStreetMap',out.width-pad,cy+cap*.2)}
     let url;try{url=out.toDataURL('image/jpeg',.9)}catch(e){this.toast("Couldn't capture this view.");return}this.shotBlob=null;try{out.toBlob(b=>{this.shotBlob=b},'image/jpeg',.9)}catch(e){}this.sfx('shutter');this.vib(25);this.setState({shot:url})}
+  globalOff(){return[OX,OY]}
+  regionName(x,y){const i=this.islands&&this.islands.length?this.nearestIsland(x,y):null;if(i&&Math.hypot(i.cx-x,i.cy-y)<i.ext+2500)return 'Off '+i.name;const L=this.state.loc||{};return L.name?'Open water near '+L.name:'Open ocean'}
+  cosVals(){const s=this.state,R=window.SailoOcean?window.SailoOcean.REWARDS:{},list=(s.cosmetics||[]).filter(k=>R[k]);
+    return{hasCos:list.length>0,cosOpts:list.map(k=>{const r=R[k],key=r.type==='Flag'?'flag':'sail',on=s.me[key]===r.col;return{name:r.name,col:r.col,bg:on?'rgba(255,122,89,.16)':'transparent',border:on?'#ff7a59':'rgba(255,255,255,.16)',pick:()=>this.setState(x=>({me:{...x.me,[key]:on?null:r.col}}))}})}}
   vib(p){if(this.state.sfx===false)return;try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
   splash(x,y,k){const sb=this.sbNow||1;if(!this.spray)return;for(let i=0;i<Math.round(16*k);i++){const a=Math.random()*6.283,v=(8+Math.random()*18)*sb*k;this.spray.push({x,y,z:0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,vz:(14+Math.random()*26)*sb*k,g:60*sb,r:(.8+Math.random()*1.4)*sb,a:0,l:.7+Math.random()*.5})}}
   celebrate(){const me=this.boatsById.me,sb=this.sbNow||1,L=TYPES[me.type].len*sb,bx=me.x+Math.cos(me.h)*L*.5,by=me.y+Math.sin(me.h)*L*.5;this.splash(bx,by,1);(this.rings||(this.rings=[])).push({x:bx,y:by,a:0,l:1.8,r:L*2},{x:me.x,y:me.y,a:-.3,l:2,r:L*3});this.sfx('splash');setTimeout(()=>this.sfx('bell'),380);this.vib([20,50,20])}
@@ -1839,7 +1920,7 @@ class Component extends DCLogic {
     const place=this.state.loc&&this.state.loc.name;if(!live)return['Preview · '+mode+' · wind '+Math.round(wind)+' km/h '+compass(w.dir),'Local preview only — other sailors still see real-world weather'];
     if(this.liveWx){const sea=m&&m.wave!=null?' · sea '+m.wave.toFixed(1)+' m':'';return[Math.round(w.temp)+'°C · '+WMO(code)+' · wind '+Math.round(w.wind)+' km/h '+compass(w.dir)+sea,'Live weather for '+place+' · Open-Meteo'+(m?' + Marine':'')+' · updated '+(w.at||'').slice(11,16)+' local']}
     return[this.wxErr?(this.lastWx?'Weather offline · holding last conditions':'Live weather unavailable · fair skies'):'Fetching live weather…','']}
-  uiTick(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const wxl=this.computeWx();if(wxl[0]!==this.state.wx||wxl[1]!==this.state.wxTitle)this.setState({wx:wxl[0],wxTitle:wxl[1]});const mode=this.props.timeOfDay||'Real time';const L=this.state.loc;let tod;
+  uiTick(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const wxl=this.computeWx();if(wxl[0]!==this.state.wx||wxl[1]!==this.state.wxTitle)this.setState({wx:wxl[0],wxTitle:wxl[1]});const mode=this.state.todMode||this.props.timeOfDay||'Real time';const L=this.state.loc;let tod;
     if(mode==='Real time'){const zi=zoneInfo(L.tz);const sun=sunTimes(zi,L.lat,L.lon);this.realP=phaseFor(zi.h,sun.sr,sun.ss);const h=zi.h;const lab=Math.abs(h-sun.sr)<.75?'Dawn':Math.abs(h-sun.ss)<.75?'Dusk':(h>sun.sr&&h<sun.ss?'Day':'Night');
       tod={label:lab,time:`${zi.hh}:${zi.mm}`,place:L.name,off:offLabel(zi.off),title:`${zi.wd} ${zi.d}/${zi.m}/${zi.y} · ${L.tz} (${offLabel(zi.off)}) · sunrise ${fmtH(sun.sr)} · sunset ${fmtH(sun.ss)}`}}
     else{const S=this.skyNow||this.sky();const hrs=S.p*24;tod={label:S.p<.22||S.p>.83?'Night':S.p<.32?'Dawn':S.p<.68?'Day':'Dusk',time:`${String(Math.floor(hrs)).padStart(2,'0')}:${String(Math.floor((hrs%1)*60)).padStart(2,'0')}`,place:mode==='Cycle'?'Fast cycle':mode,off:'',title:'Preview mode — set Time of day to Real time to follow the real clock'}}
@@ -1866,15 +1947,15 @@ class Component extends DCLogic {
   async afterAuth(u){if(this.authing)return;this.authing=true;try{
     if(!u.verified){this.setState({authView:'verify',auth:{user:u,profile:null},af:{...this.state.af,email:u.email||this.state.af.email}});return}
     this.setState({authView:'restoring',auth:{user:u,profile:null}});let prof=null;try{prof=await this.A.profile(u.id)}catch(e){}prof=prof||{};this.setState({auth:{user:u,profile:prof}});
-    try{this.applyGame(await this.A.loadGame(u.id))}catch(e){}
+    try{this.applyGame(await this.A.loadGame(u.id))}catch(e){}if(this.ocean)this.ocean.load();
     if(!prof.onboarding_completed){this.setState({authView:'onbProfile',onb:true,phase:'intro',aerr:{},af:{disp:prof.display_name||this.state.me.name||'',user:prof.username||'',bio:prof.bio||''}});if(prof.username)this.checkUname(prof.username);return}
     if(prof.display_name&&!this.state.me.name)this.setState({me:{...this.state.me,name:prof.display_name}});this.enterWorld(false)}finally{this.authing=false}}
-  applyGame(g){if(!g)return;const st=g.state||{},fl=g.fleet,patch={};['me','vis','likes','friends','convos','unread','blocked','marine','mLikes','mComments','notif','disc'].forEach(k=>{if(st[k]!=null)patch[k]=st[k]});
+  applyGame(g){if(!g)return;const st=g.state||{},fl=g.fleet,patch={};['me','vis','likes','friends','convos','unread','blocked','marine','mLikes','mComments','notif','disc','todMode','pins'].forEach(k=>{if(st[k]!=null)patch[k]=st[k]});
     if(fl)patch.fleet={...this.state.fleet,owned:fl.owned&&fl.owned.length?fl.owned:['drifter'],streak:fl.streak||0,best:fl.best||0,last:fl.last_day||null,voyages:fl.voyages||0};
     if(fl&&fl.active){const b=FLEET.find(x=>x.id===fl.active),m=patch.me||this.state.me;if(b&&m.boat!==b.id)patch.me={...m,boat:b.id,type:b.type,color:b.color}}
     if(st.loc)patch.loc=st.loc;if(st.dest)this.parkDest=st.dest;
     this.setState(patch,()=>{if(!st.loc&&!st.pos)return;const ok=st.pos&&st.pos.every&&st.pos.every(Number.isFinite);this.saved={...(this.saved||{}),pos:ok?st.pos:null,at:st.at||null};const L=this.state.loc;this.startG=ok?[st.pos[0],st.pos[1]]:ll2w(L.lon,L.lat);this.boats=null;this.boatsById=null;this.nearKey='';this.build();this.follow='me';const me=this.boatsById.me;Object.assign(this.cam,{x:me.x,y:me.y});Object.assign(this.camT,{x:me.x,y:me.y});this.fetchWeather();this.loadMapbox();this.uiTick()})}
-  gameSnapshot(){const s=this.state,me=this.boatsById&&this.boatsById.me;return{me:s.me,loc:s.loc,pos:me?[me.x+OX,me.y+OY,me.h]:null,dest:me&&me.state==='sailing'&&me.dest?me.dest:null,at:me?me.at:null,vis:s.vis,disc:s.disc,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,marine:s.marine,mLikes:s.mLikes,mComments:s.mComments,notif:s.notif,fleet:this.isReal()?undefined:s.fleet}}
+  gameSnapshot(){const s=this.state,me=this.boatsById&&this.boatsById.me;return{me:s.me,loc:s.loc,pos:me?[me.x+OX,me.y+OY,me.h]:null,dest:me&&me.state==='sailing'&&me.dest?me.dest:null,at:me?me.at:null,vis:s.vis,disc:s.disc,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,marine:s.marine,mLikes:s.mLikes,mComments:s.mComments,notif:s.notif,todMode:s.todMode,pins:s.pins,fleet:this.isReal()?undefined:s.fleet}}
   remoteSave(force){const s=this.state,u=s.auth&&s.auth.user;if(!this.A||!u||!u.verified||(s.authView&&!force))return;const now=Date.now();if(!force&&now-(this.lastRS||0)<15000)return;this.lastRS=now;try{this.A.saveGame(u.id,this.gameSnapshot())}catch(e){}}
   enterWorld(first){this.setState({authView:null,phase:first?'firstDest':'free',onboarded:true},()=>this.save());this.follow='me';this.camT.z=first?1.2:Math.max(this.camT.z,1.2);this.camK=1.2;setTimeout(()=>this.camK=3,2500);if(!first){this.scheduleRequest();if(this.parkDest&&!this.state.loggedOut)this.setState({resume:this.parkDest})}}
   checkUname(u){clearTimeout(this.unT);const err=unameErr(u);if(err){this.setState({uname:{st:'bad',msg:u?err:''}});return}this.setState({uname:{st:'checking',msg:'Checking @'+u+'…'}});
@@ -1961,7 +2042,7 @@ class Component extends DCLogic {
       streakN:String(s.dStreak??streak),numAnim:s.numPop?((s.numPop%2?'loNumA':'loNumB')+' .4s cubic-bezier(.2,.8,.2,1)'):'none',pillAnim:s.pillGlow?((s.pillGlow%2?'loGlowA':'loGlowB')+' 1.3s ease 2'):'none',pillPlus:!!s.pillPlus,pillPlusText:s.pillPlus||'',streakWord:streak===1?'day streak':'day streak',streakBest:'Best '+f.best+' · '+(s.dVoy??(f.voyages||0))+' voyage'+((s.dVoy??(f.voyages||0))===1?'':'s'),canClaim:!claimed,claimed,claimDay:this.claimDay,claimLabel:f.last===y?'Finish a voyage today to keep your '+f.streak+'-day streak.':'Finish a voyage today to start a streak.',streakDot:!claimed,days,
       fleetRows:rows,fleetCount:f.owned.length+' of '+FLEET.length+' boats',hasNext:!!next,nextLine:next?next.b.name+' · '+next.gap+' more '+(next.b.req[0]==='streak'?'streak day':'voyage')+(next.gap===1?'':'s'):'',curBoat:cur?cur.name:'Custom '+TYPES[s.me.type].label.toLowerCase()}}
   save(){this.remoteSave();this.save0()}
-  save0(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const s=this.state;if(s.phase==='intro'&&!s.onboarded)return;try{localStorage.setItem(KEY,JSON.stringify({loc:s.loc,mLikes:s.mLikes,mComments:s.mComments,onboarded:s.onboarded,me:s.me,pos:[me.x+OX,me.y+OY,me.h],dest:me.state==='sailing'&&me.dest?me.dest:(s.loggedOut||s.loggingOut?this.parkDest:null)||null,at:me.at,vis:s.vis,disc:s.disc,loggedOut:s.loggedOut||s.loggingOut,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,wxMode:s.wxMode,wxWind:s.wxWind,fleet:s.fleet,marine:s.marine,notif:s.notif,sfx:s.sfx}))}catch(e){}}
+  save0(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const s=this.state;if(s.phase==='intro'&&!s.onboarded)return;try{localStorage.setItem(KEY,JSON.stringify({loc:s.loc,mLikes:s.mLikes,mComments:s.mComments,onboarded:s.onboarded,me:s.me,pos:[me.x+OX,me.y+OY,me.h],dest:me.state==='sailing'&&me.dest?me.dest:(s.loggedOut||s.loggingOut?this.parkDest:null)||null,at:me.at,vis:s.vis,disc:s.disc,loggedOut:s.loggedOut||s.loggingOut,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,wxMode:s.wxMode,wxWind:s.wxWind,fleet:s.fleet,marine:s.marine,notif:s.notif,sfx:s.sfx,todMode:s.todMode,pins:s.pins}))}catch(e){}}
 
   goDest(d){if(!d)return;const me=this.boatsById.me;const r=this.route(me.x,me.y,d.x,d.y);if(r){this.sendBoat(me,r,d.name,d.isl);this.follow='me';this.buoy={x:me.dest.x,y:me.dest.y,t0:this.t}}}
   like(id){const on=!this.state.likes[id];this.setState(s=>({likes:{...s.likes,[id]:on}}));if(on)this.toast(`You liked ${BY[id].name.split(' ')[0]}'s profile.`)}
@@ -2066,6 +2147,7 @@ class Component extends DCLogic {
       saveLabel:s.setC?`Move my boat to ${s.setS?s.setS+', ':''}${s.setC}`:'Choose a country',saveOpacity:s.setC?1:.5,saveSettings:()=>this.saveSettings(),
       wxRows:['Auto','Clear','Cloudy','Rain','Storm','Snow','Fog'].map(n=>{const on=(n==='Auto'?'Live':n)===this.wxModeNow();return{name:n,bg:on?'#f4efe6':'transparent',fg:on?'#10232c':'#f4efe6',pick:()=>this.setState({wxMode:n==='Auto'?'Live':n,wxWind:null},()=>this.uiTick())}}),
       wxManual:this.wxModeNow()!=='Live',wxWindVal:Math.round(this.envT?this.envT.wind:12),wxWindLabel:Math.round(this.envT?this.envT.wind:12)+' km/h',onWxWind:e=>this.setState({wxWind:+e.target.value},()=>this.uiTick()),
+      todRows:['Real time','Morning','Noon','Dusk','Night'].map(n=>{const on=(s.todMode||this.props.timeOfDay||'Real time')===n;return{name:n,bg:on?'#f4efe6':'transparent',fg:on?'#10232c':'#f4efe6',pick:()=>this.setState({todMode:n},()=>this.uiTick())}}),todScope:(s.todMode||this.props.timeOfDay||'Real time')==='Real time'?'Follows the clock where you sail':'Only changes your view',
       wxScope:this.wxModeNow()==='Live'?'Real-world · shared with everyone':'Preview · only you see this',
       toggleWxSound:()=>{const on=!s.wxSound;this.setState({wxSound:on});if(on)this.audioCtx(true)},toggleSfx:()=>{const on=s.sfx===false;this.setState({sfx:on});if(on){this.audioCtx(true);setTimeout(()=>{this.sfx('pop');this.vib(20)},30)}},sfxBg:s.sfx!==false?'#ff7a59':'rgba(255,255,255,.18)',sfxKnob:s.sfx!==false?'18px':'2px',wxSoundBg:s.wxSound?'#ff7a59':'rgba(255,255,255,.18)',wxSoundKnob:s.wxSound?'18px':'2px',
       isLocate:s.phase==='locate',locQ:s.locQ,onLocQ:e=>this.setState({locQ:e.target.value}),zoneRows,deviceSub:`${dl.name} · ${offLabel(dz.off)} · ${dz.hh}:${dz.mm} now`,deviceBorder:s.loc.mode==='device'?'#ff7a59':'rgba(255,122,89,.35)',useDevice:()=>pickLoc(dl),
@@ -2109,7 +2191,7 @@ class Component extends DCLogic {
           sendComment:e=>{e.preventDefault();const txt=this.state.cDraft.trim();if(!txt)return;this.setState(x=>({cDraft:'',mComments:{...x.mComments,[k]:[...(x.mComments[k]||[]),{text:txt,ts:Date.now()}]}}))}}})(),vBg:vm?vm.bg:'',vCaption:vm?vm.caption:'',vKindLabel:vm?(vm.video?'Video placeholder':'Photo placeholder'):'',vPos:vm?`${v.idx+1} / ${vd.media.length}`:'',
       vPlaying:!!(v&&v.playing),vPaused:!(v&&v.playing),vProg:v?Math.round(v.prog*100)+'%':'0%',vTime:vm?`${fmtT(v.prog*vm.secs)} / ${vm.dur}`:'',vPlay:()=>{const x=this.state.viewer;if(!x)return;const restart=x.prog>=1;this.setState({viewer:{...x,playing:!x.playing,prog:restart?0:x.prog}},()=>{if(this.state.viewer.playing)this.runViewer()})},
       sSegs:v&&v.kind==='story'?vd.stories.map((_,i)=>({w:i<v.idx?'100%':i===v.idx?Math.round(v.prog*100)+'%':'0%'})):[],sText:v&&v.kind==='story'?vd.stories[v.idx].t:'',sAge:v&&v.kind==='story'?vd.stories[v.idx].age:'',sName:vd?vd.name:'',sInitials:vd?ini(vd.name):'',sColor:vd?vd.color:'#f4efe6',
-      ...this.fleetVals(),...this.unlockVals(),...this.bottleVals(),...this.photoVals(),...this.authVals(),welcomeRows:[['Sail anywhere','Tap the water to set a course. Your boat finds a route around the islands.'],['Discover nearby boats','Sailors within hailing distance appear as you pass. Tap a boat to say hi.'],['View profiles','Every boat carries a person: their photos, stories and status.'],['Make friends','Send a friend request, then chat from your inbox.'],['Grow your fleet','Finish a voyage every day to build your streak and unlock 23 more boats.']].map((r,i)=>({n:String(i+1),t:r[0],s:r[1]})),...this.marineVals(),hasMb:!!s.mb,mbText:s.mb||'',hasToast:!!s.toast,toastText:s.toast?s.toast.text:'',hasToastAction:!!(s.toast&&s.toast.action),toastActionLabel:s.toast&&s.toast.action?s.toast.action.label:'',toastAction:()=>{const a=s.toast&&s.toast.action;this.setState({toast:null});a&&a.fn()}}}
+      ...this.fleetVals(),...this.unlockVals(),...(this.ocean?this.ocean.vals():{showOInsp:false,showJournal:false,oRef:this.oRef,openJournal:()=>{},closeJournal:()=>{}}),...this.cosVals(),...this.bottleVals(),...this.photoVals(),...this.authVals(),welcomeRows:[['Sail anywhere','Tap the water to set a course. Your boat finds a route around the islands.'],['Discover nearby boats','Sailors within hailing distance appear as you pass. Tap a boat to say hi.'],['View profiles','Every boat carries a person: their photos, stories and status.'],['Make friends','Send a friend request, then chat from your inbox.'],['Grow your fleet','Finish a voyage every day to build your streak and unlock 23 more boats.']].map((r,i)=>({n:String(i+1),t:r[0],s:r[1]})),...this.marineVals(),hasMb:!!s.mb,mbText:s.mb||'',hasToast:!!s.toast,toastText:s.toast?s.toast.text:'',hasToastAction:!!(s.toast&&s.toast.action),toastActionLabel:s.toast&&s.toast.action?s.toast.action.label:'',toastAction:()=>{const a=s.toast&&s.toast.action;this.setState({toast:null});a&&a.fn()}}}
 }
 </script>
 </body>
