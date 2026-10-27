@@ -222,3 +222,10 @@ A separate module (`window.SailoOcean`) that plugs into the main renderer and re
 - **Underwater:** wrecks and finds are drawn beneath the surface with depth-based visibility (cloud, rain, storm, chop), water distortion, sediment, algae and coral; masts and prows of shallow wrecks break the surface; small fish gather around wrecks.
 - **Discovery:** nearby finds get a subtle ring and label; tap to inspect (spinning 3D preview), then Open / Collect / Explore / Salvage, mark the location, or continue sailing. Everything lands in the **Ocean Journal** (menu → Ocean Journal) with stats, marked locations, collection and every kind as a tile.
 - **Rewards:** picked on the server by `claim_find()` (bottom of `supabase/schema.sql`): one reward per object per sailor, treasure chests can only be claimed once worldwide (first sailor wins, synced over Realtime), and claims are rate-limited. Flag and sail rewards can be equipped under Edit boat → Treasure. In demo mode everything is stored on the device.
+
+## Fleet designs
+- Each of the 24 fleet boats has its own design in `DESIGNS` (Living Ocean.dc.html), covering length, speed, acceleration, turning, hull shape (`HULLS`), rig and signature details (outriggers, oars, funnels, gunports, lanterns and more). Fleet boats are registered as `b_<id>` types; the custom-boat picker still offers the four base types.
+- Shadows follow the sun: they fall east to west through the day, lengthen at low sun, and fade under cloud, fog, rain and at night.
+- Steam boats (Monsoon, Aurora, Tempest) give off funnel smoke that billows, lightens and drifts with the wind.
+- My Fleet tiles show a live render of each boat with speed and size ratings. Locked boats show as dark silhouettes.
+- Older saves that stored a fleet boat with a base type move onto that boat's design on load (`migMe`).
