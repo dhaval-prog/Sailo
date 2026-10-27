@@ -250,7 +250,7 @@ Backend (in `supabase/schema.sql`, applied to `dfytxscebupuqwehsojc`): `sea_note
 Other sailors in the world are demo travellers. Flotillas, moored sailors and leaderboard entries marked "demo" use them.
 
 ## 3D boat models (`sailo-models.js`)
-- The Tugboat (`models/tugboat.glb`, Rare, unlocks at 10 voyages) Tide Runner (`models/sailboat.glb`, a racing sloop) and Saffron (`models/gaff-cutter.glb`, a gaff cutter) are real glTF models rendered with three.js 0.160 (loaded from unpkg through the import map in the page head, only when a model boat is first needed).
+- The Tugboat (`models/tugboat.glb`, Rare, unlocks at 10 voyages) Tide Runner (`models/sailboat.glb`, a racing sloop) Saffron (`models/gaff-cutter.glb`, a gaff cutter) and The Drifter (`models/drift-boat.glb`, the starter drift boat, also used for the custom "Drift boat" hull) are real glTF models rendered with three.js 0.160 (loaded from unpkg through the import map in the page head, only when a model boat is first needed).
 - Each frame the model is drawn into an offscreen WebGL canvas using the game's own oblique projection (heading, camera rotation and tilt, bob, pitch and roll), clipped at sea level, and copied into the sea canvas. The model's 200 parts are merged into one mesh per paint colour.
 - The funnel position feeds the existing smoke; wake, shadow, night lights, fleet thumbnails and the unlock reveal work as for other boats. Until the model loads, a 2D stand-in tug is drawn.
 - To add another model: drop the `.glb` in `models/`, add an entry to `MODELS` in `sailo-models.js` (bow, stern, funnel and waterline node names), add a `DESIGNS` entry with `model:'<id>'`, a `FLEET` entry and a `boat_catalog` row.
