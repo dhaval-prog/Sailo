@@ -55,6 +55,7 @@ insert into public.boat_catalog values
  ('coral','Coral Skiff','drifter','#ff9fb0','Rare','streak',6),
  ('drift','Drift Queen','cat','#efe8da','Epic','streak',7),
  ('kelpie','Kelpie','launch','#3fb88a','Rare','voyages',8),
+ ('tugboat','Tugboat','launch','#22335c','Rare','voyages',10),
  ('lagoon','Lagoon Punt','drifter','#3fb8c8','Rare','streak',9),
  ('pelican','Pelican','sloop','#f2c14e','Rare','streak',10),
  ('seaglass','Seaglass','sloop','#a8e6e0','Rare','voyages',12),
