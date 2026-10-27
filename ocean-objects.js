@@ -30,7 +30,7 @@
   // hab: habitats from Marine.habAt · size: world units · mass: buoyancy response
   // sub: fraction below the waterline · act: primary action · pool: reward pool
   const K = {
-    crate: { cat: 'float', name: 'Wooden crate', rar: 'Common', hab: ['coast', 'open', 'reef'], size: 8, mass: 1.1, sub: .35, act: 'Open', pool: 'crate', desc: 'A salt-swollen shipping crate, still nailed shut.' },
+    crate: { cat: 'float', retired: true, noSpawn: true, name: 'Wooden crate', rar: 'Common', hab: ['coast', 'open', 'reef'], size: 8, mass: 1.1, sub: .35, act: 'Open', pool: 'crate', desc: 'A salt-swollen shipping crate, still nailed shut.' },
     barrel: { cat: 'float', name: 'Wooden barrel', rar: 'Common', hab: ['coast', 'open'], size: 7, mass: 1.3, sub: .45, act: 'Open', pool: 'barrel', desc: 'An oak barrel rolling in the swell. Something sloshes inside.' },
     driftwood: { cat: 'float', name: 'Driftwood', rar: 'Common', hab: ['coast', 'reef', 'open'], size: 18, mass: .6, sub: .5, act: 'Collect', pool: 'wood', desc: 'Sun-bleached driftwood, smoothed by years at sea.' },
     planks: { cat: 'float', name: 'Wooden planks', rar: 'Common', hab: ['coast', 'open'], size: 12, mass: .5, sub: .3, act: 'Collect', pool: 'wood', desc: 'Loose deck planks, scattered from some distant hull.' },
@@ -40,7 +40,7 @@
     lifebuoy: { cat: 'float', name: 'Empty lifebuoy', rar: 'Uncommon', hab: ['coast', 'open'], size: 8, mass: .4, sub: .3, act: 'Inspect', pool: 'small', desc: 'An empty lifebuoy. The name stencilled on it has faded to nothing.' },
     suitcase: { cat: 'float', name: 'Lost suitcase', rar: 'Uncommon', hab: ['open', 'coast'], size: 7, mass: 1, sub: .55, act: 'Open', pool: 'case', desc: 'A leather suitcase, its buckles green with salt.' },
     mast: { cat: 'float', name: 'Broken mast', rar: 'Uncommon', hab: ['open', 'coast'], size: 34, mass: 1.4, sub: .6, act: 'Inspect', pool: 'wood', desc: 'A snapped mast trailing torn canvas.' },
-    cargo: { cat: 'float', name: 'Cargo container', rar: 'Rare', hab: ['open', 'deep'], size: 30, mass: 5, sub: .72, act: 'Inspect', pool: 'cargo', desc: 'A lost shipping container riding low in the water.' },
+    cargo: { cat: 'float', retired: true, noSpawn: true, name: 'Cargo container', rar: 'Rare', hab: ['open', 'deep'], size: 30, mass: 5, sub: .72, act: 'Inspect', pool: 'cargo', desc: 'A lost shipping container riding low in the water.' },
     dinghy: { cat: 'float', name: 'Abandoned dinghy', rar: 'Rare', hab: ['coast', 'open'], size: 16, mass: 1.6, sub: .25, act: 'Inspect', pool: 'small', desc: 'A small dinghy drifting with no one aboard.' },
     lantern: { cat: 'float', name: 'Floating lantern', rar: 'Rare', hab: ['coast', 'reef', 'open'], size: 6, mass: .3, sub: .2, act: 'Collect', pool: 'lantern', desc: 'A paper lantern, still glowing. Someone let it go on purpose.' },
     chest: { cat: 'float', name: 'Treasure chest', rar: 'Very rare', hab: ['reef', 'coast', 'open'], size: 8, mass: 1.5, sub: .55, act: 'Open', pool: 'chest', excl: true, desc: 'A brass-bound chest, bobbing against all reason. Whoever opens it first keeps what is inside.' },
@@ -200,7 +200,7 @@
     }
     stormDebris(me) {
       const H = this.h, sb = H.sbNow || 1, [OX, OY] = H.globalOff(), a = me.h + (Math.random() - .5) * 1.6, d = (180 + Math.random() * 140) * sb, bx = me.x + Math.cos(a) * d, by = me.y + Math.sin(a) * d; if (H.isLand(bx, by)) return;
-      const kinds = ['planks', 'crate', 'barrel', 'rope', 'driftwood'], n = 3 + Math.floor(Math.random() * 3), id0 = 'storm' + Math.floor(H.t * 10);
+      const kinds = ['planks', 'barrel', 'rope', 'driftwood'], n = 3 + Math.floor(Math.random() * 3), id0 = 'storm' + Math.floor(H.t * 10);
       for (let i = 0; i < n; i++) { const kind = kinds[Math.floor(Math.random() * kinds.length)]; this.local.push({ id: kind + ':' + id0 + '_' + i, kind, d: K[kind], cat: 'float', gx: bx + OX + (Math.random() - .5) * 80, gy: by + OY + (Math.random() - .5) * 80, seed: Math.random() * 1000, h: Math.random() * TAU, ax: 10, ay: 10, per: 200, ph: 0, ph2: 0, born: H.t, storm: 1, st: { bob: 0, sp: 0, sr: 0, spin: 0, dx: 0, dy: 0, init: false } }); }
     }
     wreckFish(o) { const M = this.h.marine; try { const zn = M.zoneAt(o.x, o.y), hb = M.habAt(o.x, o.y, zn.z), cf = M.cfg(); if (!cf.on) return; const k = zn.z === 'trop' || zn.z === 'sub' ? 'tropical' : 'mackerel'; M.make(k, o.x + (Math.random() - .5) * o.d.size * .6, o.y + (Math.random() - .5) * o.d.size * .6, hb, zn, cf); } catch (e) { } }
@@ -426,7 +426,7 @@
       }
       if (out.showJournal) {
         const finds = Object.entries(this.journal.finds), byKind = {}; for (const [id, f] of finds) { (byKind[f.kind] = byKind[f.kind] || []).push({ id, ...f }); }
-        const kinds = Object.keys(K), foundKinds = kinds.filter(k => byKind[k]), rewards = {}; for (const [, f] of finds) if (f.reward) rewards[f.reward] = (rewards[f.reward] || 0) + 1;
+        const kinds = Object.keys(K).filter(k => !K[k].retired || byKind[k]), foundKinds = kinds.filter(k => byKind[k]), rewards = {}; for (const [, f] of finds) if (f.reward) rewards[f.reward] = (rewards[f.reward] || 0) + 1;
         out.jStats = [{ n: String(foundKinds.length) + '/' + kinds.length, l: 'Kinds found' }, { n: String(finds.filter(([, f]) => K[f.kind] && K[f.kind].cat === 'wreck').length), l: 'Wrecks explored' }, { n: String(finds.filter(([, f]) => K[f.kind] && RAR[K[f.kind].rar].rank >= 2).length), l: 'Rare finds' }];
         out.jSections = CATS.map(([cat, label]) => ({ label, count: kinds.filter(k => K[k].cat === cat && byKind[k]).length + ' of ' + kinds.filter(k => K[k].cat === cat).length, tiles: kinds.filter(k => K[k].cat === cat).map(k => { const l = byKind[k], got = !!l, last = got ? l.sort((a, b) => b.at - a.at)[0] : null, rc = RAR[K[k].rar].col; return { name: got ? K[k].name : '???', sub: got ? (l.length > 1 ? l.length + ' found · ' : '') + (last.region || '') : K[k].rar, img: this.thumb(k, !got), rar: K[k].rar, rarCol: rc, border: got ? 'rgba(' + hexRgb(rc) + ',.45)' : 'rgba(255,255,255,.08)', op: got ? 1 : .7, open: () => { if (!got) return; H.setState({ oinsp: { id: last.id, kind: k, mode: 'journal', gx: last.gx, gy: last.gy, x: 0, y: 0, result: null } }); } }; }) }));
         out.jRewards = Object.entries(rewards).map(([k, n]) => ({ name: (REWARDS[k] || { name: k }).name + (n > 1 ? ' ×' + n : ''), type: (REWARDS[k] || {}).type || '', dot: (REWARDS[k] && REWARDS[k].col) || '#e9cf9a' })); out.jHasRewards = out.jRewards.length > 0;

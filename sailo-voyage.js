@@ -254,7 +254,7 @@
 
     // ── First-voyage guide ──────────────────────────────────────────────────
     tut(step) { const t = this.d.tut; if (!t || t.done || t.s[step]) return; t.s[step] = 1; this.touch(); if (['course', 'arrive', 'find', 'hail'].every(k => t.s[k])) { t.done = 1; this.give({ timber: 2, rope: 2, canvas: 2, nails: 2 }, 'First voyage complete'); this.h.celebrate && this.h.celebrate(); } this.flush(); }
-    tutCrate() { const H = this.h, O = H.ocean, me = H.boatsById.me; if (!O || !window.SailoOcean || this.tutSpawned) return; this.tutSpawned = 1; const K = window.SailoOcean.KINDS, [OX, OY] = H.globalOff(); const a = me.h + .5, x = me.x + Math.cos(a) * 140, y = me.y + Math.sin(a) * 140; if (H.isLand(x, y)) return; const id = 'crate:guide-' + this.uid().replace(/[^A-Za-z0-9]/g, '').slice(0, 24); if (O.journal.finds[id]) return; O.local.push({ id, kind: 'crate', d: K.crate, cat: 'float', gx: x + OX, gy: y + OY, seed: 3.7, h: 1.1, hab: 'open', wd: 200, zone: 'trop', born: H.t, ax: 0, ay: 0, per: 500, ph: 0, ph2: 0, st: { bob: 0, sp: 0, sr: 0, spin: 0, dx: 0, dy: 0, init: false } }); setTimeout(() => H.toast('Something is floating nearby. Tap it to take a look.'), 1200); }
+    tutCrate() { const H = this.h, O = H.ocean, me = H.boatsById.me; if (!O || !window.SailoOcean || this.tutSpawned) return; this.tutSpawned = 1; const K = window.SailoOcean.KINDS, [OX, OY] = H.globalOff(); const a = me.h + .5, x = me.x + Math.cos(a) * 140, y = me.y + Math.sin(a) * 140; if (H.isLand(x, y)) return; const id = 'barrel:guide-' + this.uid().replace(/[^A-Za-z0-9]/g, '').slice(0, 24); if (O.journal.finds[id]) return; O.local.push({ id, kind: 'barrel', d: K.barrel, cat: 'float', gx: x + OX, gy: y + OY, seed: 3.7, h: 1.1, hab: 'open', wd: 200, zone: 'trop', born: H.t, ax: 0, ay: 0, per: 500, ph: 0, ph2: 0, st: { bob: 0, sp: 0, sr: 0, spin: 0, dx: 0, dy: 0, init: false } }); setTimeout(() => H.toast('Something is floating nearby. Tap it to take a look.'), 1200); }
 
     // ── Per-frame update ────────────────────────────────────────────────────
     update(dt) {
@@ -416,8 +416,7 @@
       const cs = Math.cos(p.dir), sn = Math.sin(p.dir), P = (a, b, zz) => [p.x + cs * a - sn * b + E.x * (zz || 0), p.y + sn * a + cs * b + E.y * (zz || 0)], poly = (pts, col) => { c.fillStyle = col; c.beginPath(); c.moveTo(...pts[0]); for (const q of pts.slice(1)) c.lineTo(...q); c.closePath(); c.fill(); };
       if (p.quay) { const Q = [[60, -70], [175, -78], [182, 74], [60, 66]]; poly(Q.map(([a, b]) => { const q = P(a, b, 0); return [q[0] + 4, q[1] + 6]; }), 'rgba(6,42,56,.3)'); this.box(c, P, 60, 180, -72, 70, 7, '#c2bcae', '#8a8478', '#9a9488');
         c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(...P(60, -72, 7)); c.lineTo(...P(60, 70, 7)); c.stroke();
-        this.box(c, P, 110, 160, -60, -18, 22, '#b45a42', '#8e4433', '#9e4b39'); this.box(c, P, 112, 158, 4, 52, 18, '#d9d2c2', '#a59e90', '#b3ac9e');
-        const cols = ['#2f6fd6', '#e0a640', '#c8473a', '#3f8f6a']; for (let i = 0; i < 4; i++) this.box(c, P, 72 + (i % 2) * 14, 84 + (i % 2) * 14, -50 + Math.floor(i / 2) * 30, -30 + Math.floor(i / 2) * 30, 9 + (i % 3) * 3, cols[i], 'rgba(0,0,0,.35)'); }
+        this.box(c, P, 110, 160, -60, -18, 22, '#b45a42', '#8e4433', '#9e4b39'); this.box(c, P, 112, 158, 4, 52, 18, '#d9d2c2', '#a59e90', '#b3ac9e'); }
       // timber pier beside the berth, on posts
       const b0 = 20, b1 = 34, a0 = -55, a1 = 64; poly([P(a0, b0), P(a1, b0), P(a1, b1), P(a0, b1)].map(q => [q[0] + 3, q[1] + 5]), 'rgba(6,42,56,.28)');
       c.strokeStyle = '#5a4128'; c.lineWidth = 2; for (let a = a0 + 3; a <= a1; a += 16) for (const b of [b0 + 2, b1 - 2]) { c.beginPath(); c.moveTo(...P(a, b, 0)); c.lineTo(...P(a, b, 5)); c.stroke(); }
