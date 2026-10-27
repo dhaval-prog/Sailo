@@ -9,7 +9,9 @@
     tugboat: { url: './models/tugboat.glb', bow: 'foredeck', stern: 'aft_deck', funnel: 'exhaust_L', waterline: 'boot_stripe' },
     // No boot stripe on the sloop: the waterline sits at the top of the lowest hull strake. Centre on the hull, not the eased-out sails.
     sailboat: { url: './models/sailboat.glb', bow: 'fore_hatch', stern: 'transom_board', waterY: .26, center: 'hull' },
-    gaffcutter: { url: './models/gaff-cutter.glb', bow: 'fore_hatch', stern: 'transom_board', waterline: 'boot_top', center: 'hull' }
+    gaffcutter: { url: './models/gaff-cutter.glb', bow: 'fore_hatch', stern: 'transom_board', waterline: 'boot_top', center: 'hull' },
+    driftboat: { url: './models/drift-boat.glb', bow: 'stem_cap', stern: 'transom', waterY: .2, center: 'hull' },
+    skiff: { url: './models/saltmarsh-skiff.glb', bow: 'bow_panel', stern: 'transom', waterY: -.12, center: 'hull' }
   };
   const state = {}; let libs = null, R = null, listeners = [];
 
@@ -28,7 +30,7 @@
       const groups = new Map();
       root.traverse(o => { if (!o.isMesh) return; const g = o.geometry.clone(); for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k); const ng = g.index ? g.toNonIndexed() : g; ng.applyMatrix4(new T.Matrix4().multiplyMatrices(norm, o.matrixWorld)); if (!ng.attributes.normal) ng.computeVertexNormals(); const m = o.material, key = m.name || m.uuid; if (!groups.has(key)) groups.set(key, { m, list: [] }); groups.get(key).list.push(ng); });
       const plane = new T.Plane(new T.Vector3(0, 1, 0), 0), scene = new T.Scene(), model = new T.Group(); model.matrixAutoUpdate = false; scene.add(model);
-      for (const { m, list } of groups.values()) { const geo = U.mergeGeometries(list, false); const mat = new T.MeshStandardMaterial({ color: m.color, roughness: Math.min(.9, (m.roughness ?? .6) + .1), metalness: m.metalness ?? .1, side: T.DoubleSide, clippingPlanes: [plane] }); if (/sail|pennant|jib/i.test(m.name || '')) { mat.emissive = m.color.clone().multiplyScalar(.55); mat.roughness = .95; mat.metalness = 0; } /* canvas reads white from either side */ model.add(new T.Mesh(geo, mat)); }
+      for (const { m, list } of groups.values()) { const geo = U.mergeGeometries(list, false); const mat = new T.MeshStandardMaterial({ color: m.color, roughness: Math.min(.9, (m.roughness ?? .6) + .1), metalness: m.metalness ?? .1, side: T.DoubleSide, clippingPlanes: [plane] }); if (/sail|pennant|jib/i.test(m.name || '')) { mat.emissive = m.color.clone().multiplyScalar(.55); mat.roughness = .95; mat.metalness = 0; } /* canvas reads white from either side */ if (m.transparent || (m.opacity ?? 1) < 1) { mat.transparent = true; mat.opacity = m.opacity ?? .5; mat.depthWrite = false; mat.roughness = .1; mat.metalness = .2; } model.add(new T.Mesh(geo, mat)); }
       const nb = new T.Box3().setFromObject(model); const fun = find(def.funnel) ? (() => { const fb = box(find(def.funnel)), p = new T.Vector3((fb.min.x + fb.max.x) / 2, fb.max.y, (fb.min.z + fb.max.z) / 2).applyMatrix4(norm); return { f: p.x, up: p.y, l: p.z }; })() : null;
       scene.add(new T.HemisphereLight(0xdff0ff, 0x2a4552, 1.25)); const sun = new T.DirectionalLight(0xfff1dc, 2.1); sun.position.set(-1, 2.2, 1.6); scene.add(sun); const rim = new T.DirectionalLight(0x9fd8ff, .5); rim.position.set(1.2, .6, -1); scene.add(rim);
       state[id] = { status: 'ready', T, scene, model, plane, top: nb.max.y, fun, camera: new T.OrthographicCamera(-1, 1, 1, -1, -1e5, 1e5) };

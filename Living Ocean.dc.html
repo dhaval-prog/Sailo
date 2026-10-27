@@ -1160,7 +1160,7 @@ const w2ll=(gx,gy)=>[gx/WM*360-180,Math.atan(Math.sinh(Math.PI*(1-2*gy/WM)))*180
 const fmtETA=s=>{s=Math.max(0,Math.round(s));if(s<600)return fmtT(s);if(s<3600)return Math.round(s/60)+' min';return Math.floor(s/3600)+'h '+Math.round((s%3600)/60)+'m'};
 const COMMENTS=['This is gorgeous.','Where was this?','Saving this one.','The light!','Need to sail there next.','Ha, love it.','Fair winds!'];
 const TYPES={sloop:{label:'Sloop',v:34,a:7,turn:1.0,len:28,masts:[[.04,1.3]],tiers:2,jib:true},launch:{label:'Brigantine',v:42,a:10,turn:1.2,len:34,masts:[[.2,1.15],[-.16,1.0]],tiers:2,jib:true},cat:{label:'Galleon',v:38,a:7,turn:.75,len:42,masts:[[.27,1.0],[0,1.15],[-.25,.85]],tiers:3,castle:true}};
-TYPES.drifter={label:'Rowboat',v:24,a:6,turn:1.3,len:20,masts:[],tiers:0,jib:false,row:true};
+TYPES.drifter={label:'Drift boat',model:'driftboat',foam:'sail',v:24,a:6,turn:1.3,len:22,masts:[],tiers:0,jib:false,row:true};
 for(const k in TYPES){const T=TYPES[k];T.top=T.masts.length?Math.max(...T.masts.map(m=>m[1]))*.85*T.len+T.len*.11:T.len*.3}
 const TILT=.75,HULL=[[.5,0],[.4,.42],[.22,.82],[-.05,1],[-.34,.96],[-.48,.74],[-.52,.34],[-.52,-.34],[-.48,-.74],[-.34,-.96],[-.05,-1],[.22,-.82],[.4,-.42]];
 const WOOD=['#4a2e1b','#5c3922','#6e4529','#83542f'];
@@ -1191,7 +1191,7 @@ const HULLS=(()=>{const mk=h=>{const o=h.slice();for(let i=h.length-2;i>0;i--)o.
 const DESIGNS={
  harbour:{label:'Day sloop',len:24,v:32,a:7,turn:1.15,hull:'round',beam:.26,hh:1.05,rig:'tri',masts:[[.06,1.25]],jib:1,stripe:'#ff7a59',rock:1.3},
  tide:{label:'Racing sloop',model:'sailboat',foam:'sail',len:32,v:46,a:8,turn:.95,hull:'narrow',beam:.15,hh:.85,rig:'tri',masts:[[.08,1.6]],jib:1,heel:.32,hc:['#1b2f3d','#22394a','#e9e4dc','#f6f2ea'],deck:'#d8c3a0',stripe:'#5fd4c4'},
- saltmarsh:{label:'Fishing boat',len:30,v:27,a:6,turn:.9,hull:'flat',beam:.3,hh:1.25,rig:'gaff',masts:[[.14,.85]],cabin:[-.16,.3,.75],nets:1,hc:['#24463a','#2f5a49','#3c7058','#d9d2c0'],deck:'#b89a6e',sail:'#d8c7a3'},
+ saltmarsh:{label:'Flats skiff',model:'skiff',foam:true,len:30,v:27,a:6,turn:.9,hull:'flat',beam:.3,hh:1.25,rig:'gaff',masts:[[.14,.85]],cabin:[-.16,.3,.75],nets:1,hc:['#24463a','#2f5a49','#3c7058','#d9d2c0'],deck:'#b89a6e',sail:'#d8c7a3'},
  lantern:{label:'Brig',len:36,v:40,a:9,turn:1.1,hull:'round',beam:.2,rig:'sq',masts:[[.2,1.15],[-.16,1]],tiers:2,jib:1,lanterns:1},
  reedling:{label:'Reed boat',len:22,v:22,a:5,turn:1.2,hull:'canoe',beam:.24,hh:1.15,rig:'mat',masts:[[.05,.9]],tiers:1,ends:1,reed:1,hc:['#8a7034','#a3873f','#bfa04e','#d6bb68'],deck:'#c9ad5c',sail:'#d9c38d'},
  moonwake:{label:'Catamaran',len:30,v:48,a:9,turn:1,hull:'canoe',beam:.09,twin:.2,rig:'tri',masts:[[.04,1.35]],jib:1,sail:'#dfe6f2',trail:'silver',hc:['#b9c3cc','#cfd7de','#e4e9ee','#f7f9fb'],deck:'#d6dde3'},
