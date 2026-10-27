@@ -1190,7 +1190,7 @@ const HULLS=(()=>{const mk=h=>{const o=h.slice();for(let i=h.length-2;i>0;i--)o.
  ironclad:mk([[.5,0],[.3,.72],[.1,.95],[-.42,.95],[-.5,.6],[-.5,0]])}})();
 const DESIGNS={
  harbour:{label:'Day sloop',len:24,v:32,a:7,turn:1.15,hull:'round',beam:.26,hh:1.05,rig:'tri',masts:[[.06,1.25]],jib:1,stripe:'#ff7a59',rock:1.3},
- tide:{label:'Racing sloop',len:32,v:46,a:8,turn:.95,hull:'narrow',beam:.15,hh:.85,rig:'tri',masts:[[.08,1.6]],jib:1,heel:.32,hc:['#1b2f3d','#22394a','#e9e4dc','#f6f2ea'],deck:'#d8c3a0',stripe:'#5fd4c4'},
+ tide:{label:'Racing sloop',model:'sailboat',foam:'sail',len:32,v:46,a:8,turn:.95,hull:'narrow',beam:.15,hh:.85,rig:'tri',masts:[[.08,1.6]],jib:1,heel:.32,hc:['#1b2f3d','#22394a','#e9e4dc','#f6f2ea'],deck:'#d8c3a0',stripe:'#5fd4c4'},
  saltmarsh:{label:'Fishing boat',len:30,v:27,a:6,turn:.9,hull:'flat',beam:.3,hh:1.25,rig:'gaff',masts:[[.14,.85]],cabin:[-.16,.3,.75],nets:1,hc:['#24463a','#2f5a49','#3c7058','#d9d2c0'],deck:'#b89a6e',sail:'#d8c7a3'},
  lantern:{label:'Brig',len:36,v:40,a:9,turn:1.1,hull:'round',beam:.2,rig:'sq',masts:[[.2,1.15],[-.16,1]],tiers:2,jib:1,lanterns:1},
  reedling:{label:'Reed boat',len:22,v:22,a:5,turn:1.2,hull:'canoe',beam:.24,hh:1.15,rig:'mat',masts:[[.05,.9]],tiers:1,ends:1,reed:1,hc:['#8a7034','#a3873f','#bfa04e','#d6bb68'],deck:'#c9ad5c',sail:'#d9c38d'},
@@ -1981,7 +1981,7 @@ class Component extends DCLogic {
     b.fd=(b.fd||0)+mv;const st0=L*.09,st=Math.max(st0,spd/30),rs=Math.min(4,st/st0);let n=0;
     while(b.fd>st&&n<4){b.fd-=st;n++;const back=b.fd,bx=b.x-cs*back,by=b.y-sn*back,fw=Math.min(spd,260),lat=Math.min(spd*.36,95*sb)*(.4+sp*.6);
       // propeller wash: churning white water straight behind the stern
-      for(let k=0;k<1;k++){const j=(R()-.5)*L*.14;F.push({t:'p',x:bx-cs*L*.47-sn*j,y:by-sn*L*.47+cs*j,a:0,l:4+R()*2.5+sp*2,r0:L*.06*rs,r1:L*(.24+R()*.14)*(.55+sp*.65)*Math.sqrt(rs)+L*.06*(rs-1),v:(R()*4)|0,vx:-cs*fw*.05+(R()-.5)*8*sb,vy:-sn*fw*.05+(R()-.5)*8*sb,dmp:.6,rot:R()})}
+      const sw=T.foam==='sail';for(let k=0;k<1;k++){const j=(R()-.5)*L*(sw?.08:.14);F.push({t:'p',x:bx-cs*L*.47-sn*j,y:by-sn*L*.47+cs*j,a:0,l:(4+R()*2.5+sp*2)*(sw?.55:1),r0:L*(sw?.035:.06)*rs,r1:(L*(.24+R()*.14)*(.55+sp*.65)*Math.sqrt(rs)+L*.06*(rs-1))*(sw?.5:1),v:(R()*4)|0,vx:-cs*fw*.05+(R()-.5)*8*sb,vy:-sn*fw*.05+(R()-.5)*8*sb,dmp:.6,rot:R()})}
       // Kelvin wake: two arms peeling off the bow shoulders
       for(const side of[-1,1]){const px=-sn*side,py=cs*side;F.push({t:'k',x:bx+cs*L*.28+px*L*.16,y:by+sn*L*.28+py*L*.16,a:0,l:2.6+R()*1.3,r0:L*.04*rs,r1:L*(.1+R()*.05)*rs,v:(R()*4)|0,vx:px*lat*(.75+R()*.3),vy:py*lat*(.75+R()*.3),dmp:.35,rot:R()});
         // bow spray: brief bright flecks thrown out from the stem
@@ -1992,7 +1992,7 @@ class Component extends DCLogic {
     this.fmS=[1,2,3,4].map(i=>mk(i*17,false));this.fmL=[1,2,3,4].map(i=>mk(i*31+5,true));this.fmU=sprite('rgba(170,236,230,1)',64);this.fmD=sprite('rgba(8,58,72,1)',64)}
   drawFoam(c,night){const F=this.foamP;if(!F||!F.length)return;this.foamSprites();const lum=1-night*.55;
     // aerated water under the churn: pale turquoise with a darker trough at its edge
-    for(const p of F){if(p.t!=='p')continue;const k=p.a/p.l,r=(p.r0+(p.r1-p.r0)*(1-Math.pow(1-k,2)))*1.7;c.globalAlpha=(1-k)*.2;c.drawImage(this.fmD,p.x-r*1.1+r*.12,p.y-r*1.1+r*.18,r*2.2,r*2.2);c.globalAlpha=Math.pow(1-k,1.3)*.42*lum;c.drawImage(this.fmU,p.x-r,p.y-r,r*2,r*2)}
+    for(const p of F){if(p.t!=='p')continue;const k=p.a/p.l,r=(p.r0+(p.r1-p.r0)*(1-Math.pow(1-k,2)))*1.7;c.globalAlpha=(1-k)*.07;c.drawImage(this.fmD,p.x-r*1.25+r*.1,p.y-r*1.25+r*.15,r*2.5,r*2.5);c.globalAlpha=Math.pow(1-k,1.3)*.42*lum;c.drawImage(this.fmU,p.x-r,p.y-r,r*2,r*2)}
     for(const p of F){const k=p.a/p.l,g=1-Math.pow(1-k,2),r=p.r0+(p.r1-p.r0)*g,base=p.t==='s'?1:p.t==='k'?.8:.9,al=Math.pow(1-k,1.25)*base*lum;if(al<.01)continue;
       const d=this.fmS[p.v],l=this.fmL[p.v],w=r*2;c.globalAlpha=al*(1-k*.85);c.drawImage(d,p.x-r,p.y-r,w,w);c.globalAlpha=al*Math.min(1,k*2.2)*.9;c.drawImage(l,p.x-r*1.15,p.y-r*1.15,w*1.15,w*1.15)}
     c.globalAlpha=1}
@@ -2008,7 +2008,7 @@ class Component extends DCLogic {
     const sc=W/(Math.pow(T.len,.55)*Math.pow(78,.45)*1.45);const fake={id:'__t'+f.id,x:0,y:0,h:-.5,type:f.type,color:f.color,ph:1.3,v:0,state:'sailing',wv:{h:0,p:0,r:0},wake:[],trail:[],rar:f.rarity,ancK:0,noShadow:true,thumb:true};
     const E0=this.E,env=this.env,ac=env&&env.acc,ra=env&&env.rain;this.E={x:0,y:-.78};if(env){env.acc=0;env.rain=0}try{c.setTransform(sc,0,0,sc,W/2,Hc*.76);this.drawBoat(c,fake,1.2,1)}catch(e){}this.E=E0;if(env){env.acc=ac;env.rain=ra}
     if(locked){c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';c.fillStyle='rgba(16,36,48,.8)';c.fillRect(0,0,W,Hc)}let u='';try{u=cv.toDataURL()}catch(e){}if(T.model&&!(window.SailoModels&&window.SailoModels.ready(T.model)))return u;return cache[k]=u}
-  drawModelBoat(c,b,t,s){const T=TYPES[b.type],L=T.len*s,wv=b.wv||{h:0,p:0,r:0},anc=b.state!=='sailing'&&b.v<1.5?1:0;b.ancK=(b.ancK||0)+(anc-(b.ancK||0))*Math.min(1,(this.dtNow||.016)*.8);const ak=b.ancK,rel=ang(this.wind-b.h),heel=b.v>4?Math.sin(rel)*.05*(1-ak):0;
+  drawModelBoat(c,b,t,s){const T=TYPES[b.type],L=T.len*s,wv=b.wv||{h:0,p:0,r:0},anc=b.state!=='sailing'&&b.v<1.5?1:0;b.ancK=(b.ancK||0)+(anc-(b.ancK||0))*Math.min(1,(this.dtNow||.016)*.8);const ak=b.ancK,rel=ang(this.wind-b.h),heel=b.v>4?Math.sin(rel)*(T.heel?T.heel*.55:.05)*Math.min(1,b.v/T.v+.3)*(1-ak):0;
     const SV=this.sunSh||{x:-.85,y:-.22,a:.8};if(!b.noShadow&&SV.a>.02){c.save();c.globalAlpha*=.22*SV.a;c.fillStyle='#062a38';c.beginPath();c.ellipse(b.x+SV.x*L*.14,b.y+SV.y*L*.14,L*.52,L*.16,b.h,0,6.283);c.fill();c.restore()}
     const rar=this.rarOf(b),rk=RANK[rar]||0;if(rk>=2&&!b.thumb){c.save();c.globalCompositeOperation='lighter';c.globalAlpha*=.25+.1*Math.sin(t*2+b.ph);const g=this.glow;c.drawImage(g,b.x-L*.7,b.y-L*.7,L*1.4,L*1.4);c.restore()}
     b.hDraw=b.h;return window.SailoModels.draw(T.model,c,b,{len:L,E:this.E,bob:wv.h*1.25*s,pitch:(wv.p+ak*Math.sin(t*.63+b.ph*1.7)*.04)*.8,roll:(wv.r+heel+ak*Math.sin(t*.9+b.ph)*.06)*.8,yaw:ak*Math.sin(t*.42+b.ph)*.1})}

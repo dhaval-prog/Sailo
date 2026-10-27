@@ -5,7 +5,11 @@
 // same projection, then copied into the game canvas at the boat's position. Three.js and the model
 // load only when a model boat is first needed.
 (function () {
-  const MODELS = { tugboat: { url: './models/tugboat.glb', bow: 'foredeck', stern: 'aft_deck', funnel: 'exhaust_L', waterline: 'boot_stripe' } };
+  const MODELS = {
+    tugboat: { url: './models/tugboat.glb', bow: 'foredeck', stern: 'aft_deck', funnel: 'exhaust_L', waterline: 'boot_stripe' },
+    // No boot stripe on the sloop: the waterline sits at the top of the lowest hull strake. Centre on the hull, not the eased-out sails.
+    sailboat: { url: './models/sailboat.glb', bow: 'fore_hatch', stern: 'transom_board', waterY: .26, center: 'hull' }
+  };
   const state = {}; let libs = null, R = null, listeners = [];
 
   const loadLibs = () => libs || (libs = Promise.all([import('three'), import('three/addons/loaders/GLTFLoader.js'), import('three/addons/utils/BufferGeometryUtils.js')]).then(([T, G, U]) => ({ T, GLTFLoader: G.GLTFLoader, U })));
@@ -17,13 +21,13 @@
       const find = n => root.getObjectByName(n), box = o => new T.Box3().setFromObject(o);
       // Orientation: the model is long along X; the bow is whichever end the foredeck sits on.
       const all = box(root), bowX = box(find(def.bow)).getCenter(new T.Vector3()).x, sternX = box(find(def.stern)).getCenter(new T.Vector3()).x, flip = bowX < sternX ? -1 : 1;
-      const wl = find(def.waterline) ? box(find(def.waterline)).min.y : 0, len = all.max.x - all.min.x, cx = (all.max.x + all.min.x) / 2, cz = (all.max.z + all.min.z) / 2;
+      const cb = def.center && find(def.center) ? box(find(def.center)) : all, wl = def.waterY != null ? def.waterY : find(def.waterline) ? box(find(def.waterline)).min.y : 0, len = cb.max.x - cb.min.x, cx = (cb.max.x + cb.min.x) / 2, cz = (cb.max.z + cb.min.z) / 2;
       // Normalise: origin at the hull centre on the waterline, bow along +x, length 1.
       const norm = new T.Matrix4().makeScale(1 / len, 1 / len, 1 / len).multiply(new T.Matrix4().makeRotationY(flip < 0 ? Math.PI : 0)).multiply(new T.Matrix4().makeTranslation(-cx, -wl, -cz));
       const groups = new Map();
       root.traverse(o => { if (!o.isMesh) return; const g = o.geometry.clone(); for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k); const ng = g.index ? g.toNonIndexed() : g; ng.applyMatrix4(new T.Matrix4().multiplyMatrices(norm, o.matrixWorld)); if (!ng.attributes.normal) ng.computeVertexNormals(); const m = o.material, key = m.name || m.uuid; if (!groups.has(key)) groups.set(key, { m, list: [] }); groups.get(key).list.push(ng); });
       const plane = new T.Plane(new T.Vector3(0, 1, 0), 0), scene = new T.Scene(), model = new T.Group(); model.matrixAutoUpdate = false; scene.add(model);
-      for (const { m, list } of groups.values()) { const geo = U.mergeGeometries(list, false); const mat = new T.MeshStandardMaterial({ color: m.color, roughness: Math.min(.9, (m.roughness ?? .6) + .1), metalness: m.metalness ?? .1, side: T.DoubleSide, clippingPlanes: [plane] }); model.add(new T.Mesh(geo, mat)); }
+      for (const { m, list } of groups.values()) { const geo = U.mergeGeometries(list, false); const mat = new T.MeshStandardMaterial({ color: m.color, roughness: Math.min(.9, (m.roughness ?? .6) + .1), metalness: m.metalness ?? .1, side: T.DoubleSide, clippingPlanes: [plane] }); if (/sail|pennant|jib/i.test(m.name || '')) { mat.emissive = m.color.clone().multiplyScalar(.55); mat.roughness = .95; mat.metalness = 0; } /* canvas reads white from either side */ model.add(new T.Mesh(geo, mat)); }
       const nb = new T.Box3().setFromObject(model); const fun = find(def.funnel) ? (() => { const fb = box(find(def.funnel)), p = new T.Vector3((fb.min.x + fb.max.x) / 2, fb.max.y, (fb.min.z + fb.max.z) / 2).applyMatrix4(norm); return { f: p.x, up: p.y, l: p.z }; })() : null;
       scene.add(new T.HemisphereLight(0xdff0ff, 0x2a4552, 1.25)); const sun = new T.DirectionalLight(0xfff1dc, 2.1); sun.position.set(-1, 2.2, 1.6); scene.add(sun); const rim = new T.DirectionalLight(0x9fd8ff, .5); rim.position.set(1.2, .6, -1); scene.add(rim);
       state[id] = { status: 'ready', T, scene, model, plane, top: nb.max.y, fun, camera: new T.OrthographicCamera(-1, 1, 1, -1, -1e5, 1e5) };
