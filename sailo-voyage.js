@@ -122,7 +122,7 @@
   { const cfg = window.SAILO_CONFIG || {}; if (cfg.sentryDsn) { const sc = document.createElement('script'); sc.src = 'https://browser.sentry-cdn.com/8.33.1/bundle.min.js'; sc.crossOrigin = 'anonymous'; sc.onload = () => { try { window.Sentry.init({ dsn: cfg.sentryDsn, tracesSampleRate: 0, environment: location.hostname }); } catch (e) { } }; document.head.appendChild(sc); } }
 
   // ── Offline shell: cache the app files so reloads are instant ───────────
-  try { if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/[?&]nosw\b/.test(location.search)) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { })); } catch (e) { }
+  try { if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/[?&]nosw\b/.test(location.search)) { const had = !!navigator.serviceWorker.controller; let done = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if (!had || done) return; done = true; location.reload(); }); window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => { })); } } catch (e) { }
 
   const fresh = () => ({ v: 1, km: 0, nightKm: 0, wk: { k: weekKey(), km: 0 }, stamps: {}, mats: { timber: 0, rope: 0, canvas: 0, nails: 0 }, upg: { sail: 0, hull: 0, lantern: 0, net: 0 }, q: null, ev: {}, cos: [], catch: {}, log: [], boatKm: {}, tut: { s: {}, done: 0, off: 0 }, seen: 0, notes: 0 });
 

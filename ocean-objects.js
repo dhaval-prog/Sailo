@@ -178,7 +178,7 @@
           o.x += o.st.dx; o.y += o.st.dy;
         } else o.hd = o.h;
         if (o.ok === undefined || o.ok === null) { const w = H.marine.isWater(o.x, o.y); if (w !== null) o.ok = w !== false; }
-        o.found = !!this.journal.finds[o.id]; o.gone = (o.found && o.cat === 'float' && !['cargo', 'dinghy', 'mast'].includes(o.kind)) || !!this.taken[o.id];
+        o.found = !!this.journal.finds[o.id]; o.gone = (o.found && o.cat === 'float' && !['cargo', 'dinghy', 'mast'].includes(o.kind)) || !!this.taken[o.id] || !!o.d.retired;
         const s = H.toScreen(o.x, o.y); o.sx = s.x; o.sy = s.y; o.onScreen = s.x > -80 && s.y > -80 && s.x < H.vw + 80 && s.y < H.vh + 80;
         o.dist = Math.hypot(o.x - me.x, o.y - me.y); o.near = o.dist < (240 + o.d.size * .8) * sb * (H.voy ? H.voy.reachMul() : 1);
         if (o.cat === 'float' && o.onScreen) this.physics(o, dt, e);
