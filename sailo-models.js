@@ -8,7 +8,8 @@
   const MODELS = {
     tugboat: { url: './models/tugboat.glb', bow: 'foredeck', stern: 'aft_deck', funnel: 'exhaust_L', waterline: 'boot_stripe' },
     // No boot stripe on the sloop: the waterline sits at the top of the lowest hull strake. Centre on the hull, not the eased-out sails.
-    sailboat: { url: './models/sailboat.glb', bow: 'fore_hatch', stern: 'transom_board', waterY: .26, center: 'hull' }
+    sailboat: { url: './models/sailboat.glb', bow: 'fore_hatch', stern: 'transom_board', waterY: .26, center: 'hull' },
+    gaffcutter: { url: './models/gaff-cutter.glb', bow: 'fore_hatch', stern: 'transom_board', waterline: 'boot_top', center: 'hull' }
   };
   const state = {}; let libs = null, R = null, listeners = [];
 
