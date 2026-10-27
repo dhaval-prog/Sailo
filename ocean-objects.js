@@ -115,7 +115,7 @@
       this.saveLocal(); this.refreshCosmetics();
       if (H.isReal() && H.A.subscribeClaims && !this.sub) { try { this.sub = H.A.subscribeClaims(row => { if (row && row.object_id && row.user_id !== (H.state.auth.user || {}).id) this.taken[row.object_id] = 1; }); } catch (e) { } }
     }
-    refreshCosmetics() { const own = new Set(); for (const f of Object.values(this.journal.finds)) if (f.reward && /^(flag|sail):/.test(f.reward)) own.add(f.reward); const list = [...own]; const cur = this.h.state.cosmetics || []; if (list.join() !== cur.join()) this.h.setState({ cosmetics: list }); }
+    refreshCosmetics() { const own = new Set(); for (const f of Object.values(this.journal.finds)) if (f.reward && /^(flag|sail):/.test(f.reward)) own.add(f.reward); if (this.h.voy) for (const k of this.h.voy.cosmetics()) own.add(k); const list = [...own]; const cur = this.h.state.cosmetics || []; if (list.join() !== cur.join()) this.h.setState({ cosmetics: list }); }
 
     // ── World generation (deterministic per global cell) ──────────────────────
     habitat(x, y) { const M = this.h.marine; if (!M) return null; const zn = M.zoneAt(x, y); return { zn, hb: M.habAt(x, y, zn.z) }; }
@@ -180,7 +180,7 @@
         if (o.ok === undefined || o.ok === null) { const w = H.marine.isWater(o.x, o.y); if (w !== null) o.ok = w !== false; }
         o.found = !!this.journal.finds[o.id]; o.gone = (o.found && o.cat === 'float' && !['cargo', 'dinghy', 'mast'].includes(o.kind)) || !!this.taken[o.id];
         const s = H.toScreen(o.x, o.y); o.sx = s.x; o.sy = s.y; o.onScreen = s.x > -80 && s.y > -80 && s.x < H.vw + 80 && s.y < H.vh + 80;
-        o.dist = Math.hypot(o.x - me.x, o.y - me.y); o.near = o.dist < (240 + o.d.size * .8) * sb;
+        o.dist = Math.hypot(o.x - me.x, o.y - me.y); o.near = o.dist < (240 + o.d.size * .8) * sb * (H.voy ? H.voy.reachMul() : 1);
         if (o.cat === 'float' && o.onScreen) this.physics(o, dt, e);
         if (o.cat === 'wreck' && o.near && !this.fishAt[o.id] && o.ok !== false) { this.fishAt[o.id] = 1; this.wreckFish(o); }
       }
@@ -396,6 +396,7 @@
       this.journal.finds[s.id] = { kind: s.kind, rar: d.rar, region, reward: r.reward || null, at: Date.now(), gx: s.gx, gy: s.gy }; this.saveLocal(); this.refreshCosmetics();
       const rk = RAR[d.rar].rank; H.sfx(rk >= 2 ? 'chime' : 'cork'); H.vib(rk >= 2 ? [30, 60, 30] : 20); if (d.cat === 'float' && H.splash) H.splash(s.x, s.y, .6);
       H.setState({ oinsp: { ...s, busy: false, result: { status: r.status === 'already' ? 'already' : 'new', reward: r.reward } } });
+      if (r.status !== 'already' && H.voy) try { H.voy.onFind(s.kind, d); } catch (e) { }
     }
     togglePin() { const H = this.h, s = H.state.oinsp; if (!s) return; const i = this.journal.pins.findIndex(p => p.id === s.id); if (i >= 0) this.journal.pins.splice(i, 1); else this.journal.pins.push({ id: s.id, kind: s.kind, gx: s.gx, gy: s.gy, name: K[s.kind].name, at: Date.now() }); this.saveLocal(); H.setState({ pins: this.journal.pins.slice(), oinsp: { ...s } }); H.toast(i >= 0 ? 'Mark removed.' : 'Location marked. Find it in your Ocean Journal.'); }
     sailTo(p) { const H = this.h, [OX, OY] = H.globalOff(); H.setState({ journalOpen: false, oinsp: null }); H.setDest(p.gx - OX, p.gy - OY, p.name); }

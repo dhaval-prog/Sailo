@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./config.js"></script>
 <script src="./ocean-objects.js"></script>
+<script src="./sailo-voyage.js"></script>
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -43,12 +45,16 @@
       <sc-if value="{{ navSailing }}" hint-placeholder-val="{{ false }}">
         <div style="height:4px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden"><div style="height:100%;border-radius:4px;background:#ff7a59;width:{{ navPct }};transition:width .3s linear"></div></div>
       </sc-if>
+      <sc-if value="{{ vyHasWind }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#9ff0e2;display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" style="flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"></path></svg>{{ vyWindLine }}</div></sc-if>
+      <sc-if value="{{ vyFlo }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#9ff0e2"><span>⛵⛵ {{ vyFloName }}</span><button onClick="{{ vyFloLeave }}" style="border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;border-radius:999px;height:24px;padding:0 9px;font-size:11px;cursor:pointer">Leave</button></div></sc-if>
       <div style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.66)">{{ coords }}</div>
       <div title="{{ wxTitle }}" style="display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(244,239,230,.82);padding-top:7px;border-top:1px solid rgba(255,255,255,.1)"><svg width="15" height="15" viewBox="0 0 24 24" style="flex:none;fill:none;stroke:#9fd8e6;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 11a3.5 3.5 0 0 0 1 7z"></path></svg><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ wxLine }}</span></div>
     </div>
+    <sc-if value="{{ vyHasEv }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyOpenQuests }}" style="align-self:flex-start;height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,179,92,.45);background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#ffd2a0;font-size:12px;cursor:pointer;white-space:nowrap">{{ vyEvChip }}</button></sc-if>
   </div>
   <div style="flex:1"></div>
   <div style="pointer-events:auto;display:flex;gap:8px;align-items:center">
+    <sc-if value="{{ vyTopBtn }}" hint-placeholder-val="{{ true }}"><button onClick="{{ vyOpenPanel }}" title="Quests, passport and shipwright" style="position:relative;height:44px;border-radius:50%;width:44px;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="20" height="20" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg><sc-if value="{{ vyHasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#ff7a59;color:#1b0f0a;font-size:11px;font-weight:600;display:grid;place-items:center;padding:0 4px;box-sizing:border-box">{{ vyBadge }}</span></sc-if></button></sc-if>
     <button onClick="{{ fleetToggle }}" title="My Fleet · daily streak" style="position:relative;animation:{{ pillAnim }};height:44px;padding:0 15px 0 12px;border-radius:999px;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:flex;align-items:center;gap:7px;cursor:pointer;font-family:'Geist Mono',monospace;font-size:13px;box-sizing:border-box"><svg width="19" height="19" viewBox="0 0 24 24" style="flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3v11"></path><path d="M13.6 4.5l4.6 8.5h-4.6z"></path><path d="M3 17h18l-2.6 3.5H5.6z"></path></svg><span style="display:inline-block;animation:{{ numAnim }}">{{ streakN }}</span><sc-if value="{{ pillPlus }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:50px;left:50%;white-space:nowrap;padding:4px 10px;border-radius:999px;background:#ff7a59;color:#1b0f0a;font:600 12px Geist,sans-serif;box-shadow:0 8px 24px rgba(255,122,89,.4);pointer-events:none;animation:loFloat 2.6s ease forwards">{{ pillPlusText }}</span></sc-if><sc-if value="{{ streakDot }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:1px;right:3px;width:9px;height:9px;border-radius:50%;background:#ff7a59;box-shadow:0 0 0 2px #0a1b24"></span></sc-if></button>
     <button onClick="{{ toggleSearch }}" title="Search people or islands" style="width:44px;height:44px;border-radius:50%;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="19" height="19" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg></button>
     <button onClick="{{ toggleInbox }}" title="Inbox" style="position:relative;width:44px;height:44px;border-radius:50%;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0">
@@ -69,6 +75,12 @@
     <button onClick="{{ openFleet }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer;display:flex;flex-direction:column;gap:2px" style-hover="background:rgba(255,255,255,.08)"><span>My Fleet</span><span style="font-size:12px;color:rgba(244,239,230,.66)">{{ fleetCount }} · {{ streakN }} {{ streakWord }}</span></button>
     <button onClick="{{ editBoat }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Edit boat</button>
     <button onClick="{{ openBottleWrite }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Message in a bottle</button>
+    <button onClick="{{ vyOpenQuests }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Quests &amp; events</button>
+    <button onClick="{{ vyOpenPassport }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Passport</button>
+    <button onClick="{{ vyOpenShip }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Shipwright</button>
+    <button onClick="{{ vyOpenLog }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">My sea log</button>
+    <button onClick="{{ vyOpenLeaders }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Leaderboards</button>
+    <button onClick="{{ vyComposeOpen }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Leave a note here</button>
     <button onClick="{{ openJournal }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Ocean Journal</button>
     <button onClick="{{ enterPhoto }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Photo mode</button>
     <button onClick="{{ replayIntro }}" style="text-align:left;padding:10px;border-radius:10px;border:0;background:transparent;color:#f4efe6;font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.08)">Replay intro</button>
@@ -93,6 +105,9 @@
 </sc-if>
 
 <div style="position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:12">
+  <sc-if value="{{ vyCanFish }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyFishTap }}" title="Go fishing" style="height:44px;border-radius:50%;width:44px;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0;border-color:rgba(95,212,196,.45);font-size:19px;animation:loPop .3s ease">🎣</button></sc-if>
+  <sc-if value="{{ vyStackBtn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyOpenPanel }}" title="Quests, passport and shipwright" style="position:relative;height:44px;border-radius:50%;width:44px;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="20" height="20" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="8.5"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg><sc-if value="{{ vyHasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#ff7a59;color:#1b0f0a;font-size:11px;font-weight:600;display:grid;place-items:center;padding:0 4px;box-sizing:border-box">{{ vyBadge }}</span></sc-if></button></sc-if>
+  <button onClick="{{ vyWheelToggle }}" title="Emotes" style="height:44px;border-radius:50%;width:44px;background:rgba(10,27,36,.74);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0;font-size:19px">😊</button>
   <button onClick="{{ toggleNearby }}" title="Nearby boats" style="position:relative;width:44px;height:44px;border-radius:50%;background:{{ nearbyBg }};backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0">
     <svg width="20" height="20" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.7"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="1.2" style="fill:currentColor"></circle></svg>
     <sc-if value="{{ hasNear }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#5fd4c4;color:#08202a;font-size:11px;font-weight:600;display:grid;place-items:center;padding:0 4px;box-sizing:border-box">{{ nearCount }}</span></sc-if>
@@ -276,6 +291,7 @@
       <button onClick="{{ p.chat }}" style="flex:1;height:44px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round"><path d="M4 5h16v11H9l-5 4z"></path></svg>Chat</button>
       <button onClick="{{ p.friend }}" style="flex:1.3;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:{{ p.friendBg }};color:#f4efe6;font-size:13.5px;font-weight:500;cursor:pointer;opacity:{{ p.friendOpacity }}">{{ p.friendLabel }}</button>
     </div>
+    <button onClick="{{ p.floAct }}" title="{{ p.floTitle }}" style="height:40px;border-radius:12px;border:1px solid rgba(95,212,196,.45);background:{{ p.floBg }};color:#9ff0e2;font-size:13.5px;font-weight:500;cursor:pointer;opacity:{{ p.floOp }}">⛵⛵ {{ p.floLabel }}</button>
     <button onClick="{{ p.full }}" style="align-self:flex-start;border:0;background:transparent;color:#ff9d80;font-size:13.5px;cursor:pointer;padding:2px 0">View full profile →</button>
   </div>
 </sc-if>
@@ -307,6 +323,11 @@
         <div style="display:flex;gap:8px">
           <button onClick="{{ p.chat }}" style="flex:1;height:46px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round"><path d="M4 5h16v11H9l-5 4z"></path></svg>Chat</button>
           <button onClick="{{ p.friend }}" style="flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:{{ p.friendBg }};color:#f4efe6;font-size:14px;font-weight:500;cursor:pointer;opacity:{{ p.friendOpacity }}">{{ p.friendLabel }}</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Sea log</div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px"><sc-for list="{{ p.logStats }}" as="ls" hint-placeholder-count="4"><div style="padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.06)"><div style="font-family:'Instrument Serif',serif;font-size:20px;line-height:1">{{ ls.n }}</div><div style="font-size:10.5px;color:rgba(244,239,230,.66);margin-top:2px">{{ ls.l }}</div></div></sc-for></div>
+          <div style="font-size:12.5px;color:rgba(244,239,230,.75)">{{ p.logPorts }}</div>
         </div>
         <sc-if value="{{ p.hasStory }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
@@ -426,7 +447,7 @@
           <div style="position:relative;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;border:1px solid {{ b.border }};background:{{ b.tile }};box-shadow:{{ b.glow }}">
             <sc-if value="{{ b.fresh }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:10px;right:10px;padding:2px 7px;border-radius:999px;background:#ff7a59;color:#1b0f0a;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">New</span></sc-if>
             <div style="height:88px;border-radius:12px;background:{{ b.preview }};overflow:hidden;display:grid;place-items:center">
-              <img src="{{ b.img }}" alt="" style="width:100%;height:100%;object-fit:contain;display:block;filter:{{ b.imgF }}">
+              <img src="{{ b.img }}" alt="" style="width:100%;height:100%;object-fit:contain;display:block;filter:{{ b.imgF }};transition:transform .35s cubic-bezier(.2,.8,.2,1)" style-hover="transform:scale(1.18)">
             </div>
             <div style="min-width:0">
               <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div>
@@ -742,6 +763,8 @@
         </sc-if>
         <button onClick="{{ toggleWxSound }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;cursor:pointer;font-size:13.5px;text-align:left"><span>Ocean sound · waves, wind, rain, creaks</span><span style="width:36px;height:20px;border-radius:999px;background:{{ wxSoundBg }};position:relative;flex:none"><span style="position:absolute;top:2px;left:{{ wxSoundKnob }};width:16px;height:16px;border-radius:50%;background:#f4efe6;transition:left .2s"></span></span></button>
         <button onClick="{{ toggleSfx }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;cursor:pointer;font-size:13.5px;text-align:left"><span>Sound effects &amp; vibration · bell, horn, splashes</span><span style="width:36px;height:20px;border-radius:999px;background:{{ sfxBg }};position:relative;flex:none"><span style="position:absolute;top:2px;left:{{ sfxKnob }};width:16px;height:16px;border-radius:50%;background:#f4efe6;transition:left .2s"></span></span></button>
+        <button onClick="{{ vyRemToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;cursor:pointer;font-size:13.5px;text-align:left"><span style="display:flex;flex-direction:column;gap:2px"><span>Streak reminders on this device</span><span style="font-size:11.5px;color:rgba(244,239,230,.6)">{{ vyRemSub }}</span></span><span style="width:36px;height:20px;border-radius:999px;background:{{ vyRemBg }};position:relative;flex:none"><span style="position:absolute;top:2px;left:{{ vyRemKnob }};width:16px;height:16px;border-radius:50%;background:#f4efe6;transition:left .2s"></span></span></button>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;color:rgba(244,239,230,.82)">Graphics</span><span style="font-size:11px;color:rgba(244,239,230,.58)">{{ vyGfxSub }}</span></span><div style="display:flex;gap:4px;padding:3px;border-radius:999px;background:rgba(255,255,255,.06)"><sc-for list="{{ vyGfxRows }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="height:28px;padding:0 11px;border-radius:999px;border:0;background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;cursor:pointer">{{ o.name }}</button></sc-for></div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Ocean experience · Marine life</div><div style="font-size:11.5px;color:rgba(244,239,230,.6)">Only changes your view</div></div>
@@ -888,6 +911,199 @@
     </div>
   </div>
 </sc-if>
+<sc-if value="{{ vyOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="{{ panelStyle }}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px 8px">
+      <div style="min-width:0">
+        <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#ff9d80">Captain's desk</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.1">Voyages</div>
+      </div>
+      <button onClick="{{ vyClose }}" title="Close" style="width:34px;height:34px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;flex:none">
+      <sc-for list="{{ vyTabs }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.pick }}" style="height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;cursor:pointer;flex:none;white-space:nowrap">{{ o.label }}</button></sc-for>
+    </div>
+    <div style="flex:1;overflow:auto;padding:4px 16px 18px;display:flex;flex-direction:column;gap:14px">
+      <sc-if value="{{ vyTQ }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ vyEvent }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,179,92,.18),rgba(255,122,89,.08));border:1px solid rgba(255,179,92,.4);display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-family:'Instrument Serif',serif;font-size:22px">{{ vyEvIcon }} {{ vyEvName }}</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.7);white-space:nowrap">{{ vyEvEnds }}</span></div>
+            <div style="font-size:12.5px;line-height:1.45;color:rgba(244,239,230,.86);text-wrap:pretty">{{ vyEvDesc }}</div>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(244,239,230,.75)"><span>{{ vyEvReward }}</span><span style="font-family:'Geist Mono',monospace">{{ vyEvTokens }}</span></div>
+            <div style="height:5px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden"><div style="height:100%;width:{{ vyEvPct }};background:#ffb35c;border-radius:5px"></div></div>
+          </div>
+        </sc-if>
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Today's quests</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6)">{{ vyQuestReset }}</span></div>
+        <sc-for list="{{ vyQuests }}" as="qq" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid {{ qq.border }}">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px;width:28px;text-align:center;flex:none">{{ qq.icon }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:500">{{ qq.label }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.65)">Reward: {{ qq.rw }}</span></span><span style="font-family:'Geist Mono',monospace;font-size:12px;color:rgba(244,239,230,.8)">{{ qq.prog }}</span></div>
+            <sc-if value="{{ qq.open }}" hint-placeholder-val="{{ true }}"><div style="height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden"><div style="height:100%;width:{{ qq.pct }};background:#5fd4c4;border-radius:4px;transition:width .4s"></div></div></sc-if>
+            <sc-if value="{{ qq.canClaim }}" hint-placeholder-val="{{ false }}"><button onClick="{{ qq.claim }}" style="height:36px;border-radius:10px;border:0;background:#ff7a59;color:#1b0f0a;font-size:13.5px;font-weight:600;cursor:pointer;animation:loGlowA 1.6s ease infinite">Claim reward</button></sc-if>
+            <sc-if value="{{ qq.claimed }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#9ff0e2">✓ Reward collected</div></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ vyChestReady }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyChestClaim }}" style="height:46px;border-radius:14px;border:1px solid rgba(242,193,78,.6);background:rgba(242,193,78,.16);color:#f8dc8c;font-size:14px;font-weight:600;cursor:pointer">🧰 Open the captain's chest · all quests done</button></sc-if>
+        <sc-if value="{{ vyChestDone }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:rgba(244,239,230,.7);text-align:center">All done for today. New quests arrive at midnight.</div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Materials in your hold</span><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px"><sc-for list="{{ vyMats }}" as="m" hint-placeholder-count="4"><div style="padding:8px;border-radius:12px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px;align-items:flex-start"><span style="font-family:'Instrument Serif',serif;font-size:22px;line-height:1">{{ m.n }}</span><span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:rgba(244,239,230,.7)"><span style="width:8px;height:8px;border-radius:50%;background:{{ m.col }}"></span>{{ m.name }}</span></div></sc-for></div></div>
+        <div style="font-size:11.5px;color:rgba(244,239,230,.6);text-wrap:pretty">Collect materials from floating debris and wrecks, then spend them in the Shipwright tab.</div>
+      </sc-if>
+      <sc-if value="{{ vyTP }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:12px 14px;border-radius:16px;background:rgba(95,212,196,.08);border:1px solid rgba(95,212,196,.3);display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:'Instrument Serif',serif;font-size:24px">{{ vyStampCount }}</div>
+          <div style="height:5px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden"><div style="height:100%;width:{{ vyStampPct }};background:#5fd4c4"></div></div>
+          <div style="font-size:12px;color:rgba(244,239,230,.75)">{{ vyNavFlag }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Nearest ports</div>
+          <sc-for list="{{ vyNear }}" as="np" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05)"><span style="font-size:16px">⚓</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:13.5px">{{ np.name }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.62)">{{ np.sub }}</span></span><button onClick="{{ np.go }}" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#f4efe6;font-size:12px;cursor:pointer">Set sail</button></div></sc-for>
+        </div>
+        <sc-for list="{{ vyRegions }}" as="rg" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">{{ rg.name }}</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6)">{{ rg.count }}</span></div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+              <sc-for list="{{ rg.stamps }}" as="sp" hint-placeholder-count="6"><div style="padding:7px 8px;border-radius:12px;border:1px dashed {{ sp.border }};background:{{ sp.bg }};opacity:{{ sp.op }};display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sp.name }}</span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:#9ff0e2;min-height:12px">{{ sp.sub }}</span></div></sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ vyTS }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px"><sc-for list="{{ vyMats }}" as="m" hint-placeholder-count="4"><div style="padding:8px;border-radius:12px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:2px"><span style="font-family:'Instrument Serif',serif;font-size:22px;line-height:1">{{ m.n }}</span><span style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:rgba(244,239,230,.7)"><span style="width:8px;height:8px;border-radius:50%;background:{{ m.col }}"></span>{{ m.name }}</span></div></sc-for></div>
+        <sc-for list="{{ vyUpg }}" as="ug" hint-placeholder-count="4">
+          <div style="padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px;width:30px;text-align:center">{{ ug.icon }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:500">{{ ug.name }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.65)">{{ ug.level }} · {{ ug.now }}</span></span><span style="display:flex;gap:3px"><sc-for list="{{ ug.pips }}" as="pp" hint-placeholder-count="3"><span style="width:14px;height:5px;border-radius:3px;background:{{ pp.bg }}"></span></sc-for></span></div>
+            <div style="font-size:12.5px;line-height:1.45;color:rgba(244,239,230,.8)">{{ ug.desc }}</div>
+            <sc-if value="{{ ug.notMax }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:10px"><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12.5px;color:#9ff0e2">{{ ug.next }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.62)">{{ ug.cost }}</span></span><button onClick="{{ ug.buy }}" style="height:36px;padding:0 14px;border-radius:10px;border:0;background:{{ ug.btnBg }};color:{{ ug.btnFg }};font-size:13px;font-weight:600;cursor:pointer;flex:none">Upgrade</button></div></sc-if>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ vyTL }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><sc-for list="{{ vyStats }}" as="st" hint-placeholder-count="6"><div style="padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06)"><div style="font-family:'Instrument Serif',serif;font-size:22px;line-height:1.05">{{ st.n }}</div><div style="font-size:11px;color:rgba(244,239,230,.66);margin-top:2px">{{ st.l }}</div></div></sc-for></div>
+        <div style="font-size:13px;color:rgba(244,239,230,.85)">{{ vyFav }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Your routes</div>
+          <sc-if value="{{ vyHasRoutes }}" hint-placeholder-val="{{ false }}"><img src="{{ vyRouteImg }}" alt="Map of your recent voyages" style="width:100%;height:auto;display:block;border-radius:14px;background:radial-gradient(circle at 30% 30%,rgba(95,212,196,.12),rgba(4,24,34,.6))"></sc-if>
+          <sc-if value="{{ vyNoRoutes }}" hint-placeholder-val="{{ true }}"><div style="padding:16px;border-radius:14px;background:rgba(255,255,255,.04);font-size:12.5px;color:rgba(244,239,230,.65);text-align:center">Finish a voyage and your route appears here.</div></sc-if>
+          <sc-for list="{{ vyVoyages }}" as="vv" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ vv.to }}</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6);white-space:nowrap">{{ vv.sub }}</span></div></sc-for>
+        </div>
+        <sc-if value="{{ vyHasTop }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Best finds</div><sc-for list="{{ vyTop }}" as="tf" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;gap:10px;font-size:13px"><span>{{ tf.name }}</span><span style="font-size:11.5px;color:rgba(244,239,230,.6)">{{ tf.sub }}</span></div></sc-for></div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.66)">Catch log</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6)">{{ vyCatchCount }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px"><sc-for list="{{ vyCatch }}" as="cf" hint-placeholder-count="6"><div style="padding:8px;border-radius:12px;background:rgba(255,255,255,.04);opacity:{{ cf.op }};display:flex;flex-direction:column;gap:4px;min-width:0"><svg width="34" height="16" viewBox="0 0 34 16"><path d="M2 8c6-7 16-7 23 0-7 7-17 7-23 0z" style="fill:{{ cf.col }}"></path><path d="M24 8l8-6v12z" style="fill:{{ cf.col }}"></path></svg><span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.name }}</span><span style="font-size:10px;color:{{ cf.rarCol }}">{{ cf.sub }}</span></div></sc-for></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ vyTB }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ vyLbKinds }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;cursor:pointer">{{ o.label }}</button></sc-for></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:-6px"><sc-for list="{{ vyLbScopes }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;cursor:pointer">{{ o.label }}</button></sc-for></div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ vyLb }}" as="lr" hint-placeholder-count="8"><div style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:12px;background:{{ lr.bg }}"><span style="width:22px;font-family:'Geist Mono',monospace;font-size:12px;color:rgba(244,239,230,.6);text-align:right">{{ lr.rank }}</span><span style="width:28px;height:28px;border-radius:50%;background:{{ lr.color }};color:#10232c;font-size:11px;font-weight:600;display:grid;place-items:center;flex:none">{{ lr.initials }}</span><span style="flex:1;min-width:0;font-size:13.5px;font-weight:{{ lr.weight }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ lr.name }}</span><sc-if value="{{ lr.demo }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:5px;border:1px solid rgba(242,193,78,.45);color:#f2c14e">demo</span></sc-if><span style="font-family:'Geist Mono',monospace;font-size:12.5px">{{ lr.val }}</span></div></sc-for>
+        </div>
+        <div style="font-size:11.5px;color:rgba(244,239,230,.6);text-wrap:pretty">{{ vyLbNote }}</div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<div style="position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:min(380px, calc(100vw - 96px));display:flex;flex-direction:column;gap:10px;z-index:22;pointer-events:none">
+  <sc-if value="{{ vyCard }}" hint-placeholder-val="{{ false }}">
+    <div style="pointer-events:auto;position:relative;background:rgba(10,27,36,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(3,14,20,.45);animation:loPop .3s cubic-bezier(.2,.8,.2,1)">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="width:58px;height:58px;flex:none;border-radius:50%;border:2px dashed {{ vyCardRing }};display:grid;place-items:center;transform:rotate({{ vyCardStampRot }});font-size:24px;background:rgba(95,212,196,.08)">⚓</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#9ff0e2">Port</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1.05">{{ vyCardName }}</div>
+          <div style="font-size:12px;color:rgba(244,239,230,.7);margin-top:2px">{{ vyCardSub }}</div>
+        </div>
+        <button onClick="{{ vyCardClose }}" title="Close" style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:transparent;color:#f4efe6;display:grid;place-items:center;cursor:pointer;padding:0"><svg width="13" height="13" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <sc-if value="{{ vyCardFresh }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;padding:4px 10px;border-radius:8px;border:2px solid #ff7a59;color:#ff9d80;font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;transform:rotate(-4deg);animation:loPop .5s cubic-bezier(.2,1.6,.4,1)">New stamp</div></sc-if>
+      <div style="font-size:12.5px;color:rgba(244,239,230,.82)">{{ vyCardStamp }}</div>
+      <sc-if value="{{ vyCardHasSailors }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:11.5px;color:rgba(244,239,230,.65)">Moored here:</span><sc-for list="{{ vyCardSailors }}" as="ms" hint-placeholder-count="2"><button onClick="{{ ms.pick }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 4px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#f4efe6;font-size:12.5px;cursor:pointer"><span style="width:22px;height:22px;border-radius:50%;background:{{ ms.color }};color:#10232c;font-size:10px;font-weight:600;display:grid;place-items:center">{{ ms.initials }}</span>{{ ms.name }}</button></sc-for></div></sc-if>
+      <div style="display:flex;gap:8px">
+        <sc-if value="{{ vyCardCanGo }}" hint-placeholder-val="{{ true }}"><button onClick="{{ vyCardGo }}" style="flex:1;height:40px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;font-size:13.5px;font-weight:600;cursor:pointer">Set sail here</button></sc-if>
+        <sc-if value="{{ vyCardDocked }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyCardNote }}" style="flex:1;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;font-size:13.5px;cursor:pointer">Leave a note</button></sc-if>
+        <button onClick="{{ vyCardPassport }}" style="flex:1;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;font-size:13.5px;cursor:pointer">Passport</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ vyFishing }}" hint-placeholder-val="{{ false }}">
+    <div style="pointer-events:auto;background:rgba(10,27,36,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(3,14,20,.45);animation:loPop .3s cubic-bezier(.2,.8,.2,1)">
+      <sc-if value="{{ vyFishWait }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px"><span style="font-size:26px">🎣</span><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:500">Watch the float…</span><span style="font-size:12px;color:rgba(244,239,230,.68)">{{ vyFishZone }} · strike when it dips</span></span></div>
+        <div style="display:flex;gap:8px"><button onClick="{{ vyFishTap }}" style="flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:rgba(244,239,230,.75);font-size:15px;font-weight:600;cursor:pointer">Strike</button><button onClick="{{ vyFishStop }}" style="height:46px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;font-size:13px;cursor:pointer">Reel in</button></div>
+      </sc-if>
+      <sc-if value="{{ vyFishBite }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:15px;font-weight:600;color:#ffb35c;text-align:center">Something's biting!</div>
+        <button onClick="{{ vyFishTap }}" style="height:54px;border-radius:14px;border:0;background:#ff7a59;color:#1b0f0a;font-size:18px;font-weight:700;letter-spacing:.04em;cursor:pointer;animation:loGlowA .5s ease infinite">STRIKE!</button>
+      </sc-if>
+      <sc-if value="{{ vyFishRes }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ vyFishGot }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px"><svg width="64" height="30" viewBox="0 0 34 16" style="flex:none"><path d="M2 8c6-7 16-7 23 0-7 7-17 7-23 0z" style="fill:{{ vyFishCol }}"></path><path d="M24 8l8-6v12z" style="fill:{{ vyFishCol }}"></path><circle cx="7" cy="7" r="1.1" style="fill:#10232c"></circle></svg><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Instrument Serif',serif;font-size:24px;line-height:1.05">{{ vyFishName }}</span><span style="font-size:12px;color:{{ vyFishRarCol }}">{{ vyFishRar }} · {{ vyFishKg }}</span></span></div>
+          <sc-if value="{{ vyFishNew }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#9ff0e2">New species for your catch log!</div></sc-if>
+          <sc-if value="{{ vyFishBest }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#f2c14e">Your biggest one yet.</div></sc-if>
+        </sc-if>
+        <sc-if value="{{ vyFishMiss }}" hint-placeholder-val="{{ false }}"><div style="font-size:14px;text-align:center;color:rgba(244,239,230,.85)">{{ vyFishMissText }}</div></sc-if>
+        <div style="display:flex;gap:8px"><button onClick="{{ vyFishTap }}" style="flex:1;height:42px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;font-size:14px;font-weight:600;cursor:pointer">Cast again</button><button onClick="{{ vyFishStop }}" style="flex:1;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;font-size:14px;cursor:pointer">Done</button></div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+
+<sc-if value="{{ vyTut }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:12px;bottom:12px;z-index:13;width:min(250px, calc(100vw - 90px));background:rgba(10,27,36,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;animation:loPop .3s ease">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#ff9d80">Your first voyage</span><span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(244,239,230,.6)">{{ vyTutCount }}</span></div>
+    <sc-for list="{{ vyTutSteps }}" as="ts" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:9px;font-size:13px;opacity:{{ ts.op }}"><span style="width:18px;height:18px;border-radius:50%;border:1.5px solid {{ ts.border }};background:{{ ts.bg }};color:#08202a;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none">{{ ts.mark }}</span>{{ ts.label }}</div></sc-for>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:rgba(244,239,230,.6)">Reward: 2 of every material</span><button onClick="{{ vyTutSkip }}" style="border:0;background:transparent;color:rgba(244,239,230,.6);font-size:11.5px;cursor:pointer;padding:2px 0">Hide</button></div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ vyWheel }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ vyWheelToggle }}" style="position:absolute;inset:0;z-index:40;background:rgba(4,12,18,.35);display:grid;place-items:center;animation:loFade .2s ease">
+    <div onClick="{{ stop }}" style="position:relative;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(10,27,36,.92) 0 38%,rgba(10,27,36,.75) 39% 70%,rgba(10,27,36,0) 71%);animation:loPop .3s cubic-bezier(.2,1.4,.4,1)">
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,239,230,.7);text-align:center;line-height:1.4">Send<br>an emote</div>
+      <sc-for list="{{ vyEmotes }}" as="em" hint-placeholder-count="8"><button onClick="{{ em.send }}" title="{{ em.label }}" aria-label="{{ em.label }}" style="position:absolute;left:{{ em.left }};top:{{ em.top }};width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font-size:24px;cursor:pointer;display:grid;place-items:center;padding:0;transition:transform .15s ease,background .2s" style-hover="background:rgba(255,122,89,.3);transform:scale(1.12)" style-active="transform:scale(.9)">{{ em.icon }}</button></sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ vyNote }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ vyNoteClose }}" style="position:absolute;inset:0;z-index:40;background:rgba(4,12,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px;animation:loFade .2s ease">
+    <div onClick="{{ stop }}" style="width:min(360px, 100%);background:#f6ecd8;color:#2b2218;border-radius:6px 18px 6px 18px;padding:22px 22px 16px;box-shadow:0 30px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:14px;transform:rotate(-1.2deg);animation:loPop .35s cubic-bezier(.2,1.3,.4,1)">
+      <div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#9a6b3d">A note left at sea</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:23px;line-height:1.3;text-wrap:pretty">“{{ vyNoteBody }}”</div>
+      <div style="font-size:12.5px;color:#7a6550">— {{ vyNoteBy }} · {{ vyNoteAge }}</div>
+      <div style="display:flex;gap:8px;align-items:center;border-top:1px dashed rgba(90,60,30,.3);padding-top:10px">
+        <button onClick="{{ vyNoteLike }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(90,60,30,.3);background:transparent;color:#2b2218;font-size:13px;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" style="fill:{{ vyNoteLikeFill }};stroke:#c4553a;stroke-width:2;stroke-linejoin:round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>{{ vyNoteLikes }}</button>
+        <span style="flex:1"></span>
+        <sc-if value="{{ vyNoteCanReport }}" hint-placeholder-val="{{ false }}"><button onClick="{{ vyNoteReport }}" style="border:0;background:transparent;color:#7a6550;font-size:12.5px;cursor:pointer">Report</button></sc-if>
+        <button onClick="{{ vyNoteClose }}" style="height:34px;padding:0 14px;border-radius:999px;border:0;background:#2b2218;color:#f6ecd8;font-size:13px;cursor:pointer">Close</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ vyCompose }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ vyComposeClose }}" style="position:absolute;inset:0;z-index:40;background:rgba(4,12,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px;animation:loFade .2s ease">
+    <form onClick="{{ stop }}" onSubmit="{{ vyPost }}" style="width:min(380px, 100%);background:rgba(10,27,36,.97);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;color:#f4efe6;animation:loPop .3s ease">
+      <div><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#ff9d80">Leave a note</div><div style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1.1">Anchor a message here</div><div style="font-size:12.5px;color:rgba(244,239,230,.7);margin-top:4px">It floats at this spot for 60 days. Anyone who sails past can read it.</div></div>
+      <textarea value="{{ vyDraft }}" onChange="{{ vyOnDraft }}" maxlength="140" rows="3" placeholder="A tip, a hello, a thought for the next sailor…" style="resize:none;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#f4efe6;padding:10px 12px;font:400 14.5px/1.45 Geist,sans-serif;outline:none"></textarea>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(244,239,230,.6)"><span>Be kind. Notes can be reported.</span><span style="font-family:'Geist Mono',monospace">{{ vyCount }}</span></div>
+      <sc-if value="{{ vyHasCErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#ff9d80">{{ vyCErr }}</div></sc-if>
+      <div style="display:flex;gap:8px"><button type="button" onClick="{{ vyComposeClose }}" style="flex:1;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#f4efe6;font-size:14px;cursor:pointer">Cancel</button><button type="submit" style="flex:1.4;height:44px;border-radius:12px;border:0;background:#ff7a59;color:#1b0f0a;font-size:14px;font-weight:600;cursor:pointer">{{ vyPostLabel }}</button></div>
+    </form>
+  </div>
+</sc-if>
+
+<sc-if value="{{ vyRet }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:41;background:rgba(4,12,18,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;animation:loFade .3s ease">
+    <div style="width:min(380px, 100%);background:rgba(10,27,36,.97);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px;color:#f4efe6;animation:loPop .4s cubic-bezier(.2,.8,.2,1)">
+      <div><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#ff9d80">{{ vyRetSub }}</div><div style="font-family:'Instrument Serif',serif;font-size:32px;line-height:1.05">{{ vyRetTitle }}</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ vyRetLines }}" as="rl" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4"><span style="font-size:18px;width:24px;text-align:center;flex:none">{{ rl.icon }}</span><span>{{ rl.text }}</span></div></sc-for></div>
+      <div style="padding:12px 14px;border-radius:14px;background:rgba(242,193,78,.12);border:1px solid rgba(242,193,78,.4);display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f2c14e">A gift washed up</span><span style="font-size:15px">{{ vyRetGift }}</span></div>
+      <button onClick="{{ vyRetCollect }}" style="height:48px;border-radius:14px;border:0;background:#ff7a59;color:#1b0f0a;font-size:15px;font-weight:600;cursor:pointer">Collect and set sail</button>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
   <div style="position:absolute;left:50%;top:max(16px, env(safe-area-inset-top));transform:translateX(-50%);z-index:60;max-width:calc(100vw - 24px);display:flex;align-items:center;gap:12px;padding:11px 14px 11px 16px;border-radius:14px;background:rgba(10,27,36,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.14);box-shadow:0 12px 40px rgba(3,14,20,.4);animation:loPop .25s ease;box-sizing:border-box">
     <span style="font-size:13.5px;text-wrap:pretty">{{ toastText }}</span>
@@ -1319,19 +1535,27 @@ function realAuth(key,onEvent){const sb=window.supabase.createClient(SB_URL,key,
   async oceanClaims(ids){const{data,error}=await sb.from('ocean_claims').select('object_id,user_id').in('object_id',ids.slice(0,100));if(error)throw error;return data},
   subscribeClaims(cb){const ch=sb.channel('ocean-claims').on('postgres_changes',{event:'INSERT',schema:'public',table:'ocean_claims'},p=>cb(p.new)).subscribe();return ch},
   async reportBottle(id){const{error}=await sb.from('bottle_reports').insert({bottle_id:id});return error&&error.code!=='23505'?{error:"Couldn't send the report."}:{}},
+  async nearbyNotes(gx,gy,r){const{data,error}=await sb.rpc('nearby_notes',{p_gx:gx,p_gy:gy,p_r:r});if(error)throw error;return(data||[]).map(n=>({id:n.id,gx:n.gx,gy:n.gy,body:n.body,author:n.author_name||'A sailor',created:Date.parse(n.created_at)||Date.now(),likes:n.likes||0,liked:!!n.liked,mine:!!n.mine}))},
+  async postNote(gx,gy,body){const{error}=await sb.from('sea_notes').insert({gx,gy,body});if(error)return{error:/rate_limited/.test(error.message||'')?'You can leave another note in a little while.':/check|length/.test(error.message||'')?'Keep it between 1 and 140 characters.':"Couldn't leave your note right now."};return{}},
+  async likeNote(id){const{error}=await sb.rpc('toggle_note_like',{p_note:id});if(error)throw error},
+  async reportNote(id){const{error}=await sb.from('note_reports').insert({note_id:id});if(error&&error.code!=='23505')throw error},
+  async leaderboard(kind){const{data,error}=await sb.rpc('leaderboard',{p_kind:kind});if(error)throw error;return data||[]},
+  async addDistance(k){const{error}=await sb.rpc('add_distance',{p_km:Math.round(k*100)/100});if(error)throw error},
+  async logError(e){await sb.from('client_errors').insert({message:e.msg,stack:e.stack,source:e.src,url:e.url,ua:e.ua})},
   async reauth(email,pw){const{error}=await sb.auth.signInWithPassword({email,password:pw});return !error},
   async deleteAccount(){const{error}=await sb.functions.invoke('delete-account',{body:{}});if(error)return{error:"Account deletion isn't available yet. Try again later."};await sb.auth.signOut();return{}}}}
 const readSave=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
 
 class Component extends DCLogic {
   saved=readSave();
-  state=(()=>{const d=this.saved||{};const on=!!d.onboarded;return{wxMode:d.wxMode||null,wxWind:d.wxWind??null,wxSound:false,sfx:d.sfx!==false,todMode:d.todMode||null,pins:d.pins||[],cosmetics:[],oinsp:null,journalOpen:false,unlockQ:[],phase:'intro',onboarded:on,me:migMe(d.me)||{name:'',color:'#c89b6a',type:'drifter',boat:'drifter'},sel:null,full:false,chat:null,inbox:false,tab:'messages',viewer:null,likes:d.likes||{},friends:d.friends||{},convos:d.convos||{},unread:d.unread||{},typing:null,vis:d.vis||'everyone',disc:d.disc!==false,visOpen:false,meOpen:false,searchOpen:false,q:'',nearbyOn:false,nearIds:[],nav:{},tod:{label:'',time:''},toast:null,loggedOut:on&&!!d.loggedOut,loggingOut:false,resume:null,blocked:d.blocked||{},mobile:typeof window!=='undefined'&&window.innerWidth<720,draft:'',editing:false,discoverId:null,loc:d.loc||deviceLoc(),locQ:'',camOpen:false,camView:'Angled',editingLoc:false,mLikes:d.mLikes||{},mComments:d.mComments||{},cDraft:'',wx:'',fleet:{owned:['drifter'],streak:0,best:0,last:null,voyages:0,fresh:[],...(d.fleet||{})},fleetOpen:false,authView:'restoring',auth:{user:null,profile:null},af:{},aerr:{},abusy:false,uname:{st:'idle',msg:''},showPw:false,resendAt:0,onb:false,pwOpen:false,notifOpen:false,delOpen:false,notif:{friends:true,messages:true,streak:true,...(d.notif||{})},marine:{on:true,dens:'Medium',vis:'Realistic',q:'Medium',...(d.marine||{})}}})();
+  state=(()=>{const d=this.saved||{};const on=!!d.onboarded;return{voy:d.voy||null,gfx:d.gfx||'Auto',vyUI:{},wxMode:d.wxMode||null,wxWind:d.wxWind??null,wxSound:false,sfx:d.sfx!==false,todMode:d.todMode||null,pins:d.pins||[],cosmetics:[],oinsp:null,journalOpen:false,unlockQ:[],phase:'intro',onboarded:on,me:migMe(d.me)||{name:'',color:'#c89b6a',type:'drifter',boat:'drifter'},sel:null,full:false,chat:null,inbox:false,tab:'messages',viewer:null,likes:d.likes||{},friends:d.friends||{},convos:d.convos||{},unread:d.unread||{},typing:null,vis:d.vis||'everyone',disc:d.disc!==false,visOpen:false,meOpen:false,searchOpen:false,q:'',nearbyOn:false,nearIds:[],nav:{},tod:{label:'',time:''},toast:null,loggedOut:on&&!!d.loggedOut,loggingOut:false,resume:null,blocked:d.blocked||{},mobile:typeof window!=='undefined'&&window.innerWidth<720,draft:'',editing:false,discoverId:null,loc:d.loc||deviceLoc(),locQ:'',camOpen:false,camView:'Angled',editingLoc:false,mLikes:d.mLikes||{},mComments:d.mComments||{},cDraft:'',wx:'',fleet:{owned:['drifter'],streak:0,best:0,last:null,voyages:0,fresh:[],...(d.fleet||{})},fleetOpen:false,authView:'restoring',auth:{user:null,profile:null},af:{},aerr:{},abusy:false,uname:{st:'idle',msg:''},showPw:false,resendAt:0,onb:false,pwOpen:false,notifOpen:false,delOpen:false,notif:{friends:true,messages:true,streak:true,...(d.notif||{})},marine:{on:true,dens:'Medium',vis:'Realistic',q:'Medium',...(d.marine||{})}}})();
   canvasRef=React.createRef();unlockRef=React.createRef();oRef=React.createRef();mapRef=React.createRef();cardRef=React.createRef();msgRef=React.createRef();compassRef=React.createRef();
   mbCache={};t=0;wind=0.5;cam={x:W/2,y:H/2,z:0.3,r:0,p:.7};camT={x:W/2,y:H/2,z:0.3,r:0,p:.7};camK=3;follow=null;nearKey='';
 
   componentDidMount(){try{if(/[?&]debug\b/.test(location.search))window.__sailo=this}catch(e){}this.streakT=setTimeout(()=>{const s=this.state,f=s.fleet;if(!s.authView&&s.onboarded&&!s.loggedOut&&f.last!==dayKey(0)&&f.last===dayKey(-1))this.toast('Finish a voyage today to keep your '+f.streak+'-day streak.')},9000);this.authIv=setInterval(()=>{if(this.state.authView==='verify')this.forceUpdate()},1000);setTimeout(()=>this.initAuth(),0);
     {const d=this.saved;const L=this.state.loc;this.startG=d&&d.pos&&d.pos.every(Number.isFinite)?[d.pos[0],d.pos[1]]:ll2w(L.lon,L.lat)}
-    this.build();this.initMap();try{this.ocean=window.SailoOcean?new window.SailoOcean(this):null}catch(e){console.warn('ocean init',e)}
+    this.build();this.initMap();try{this.ocean=window.SailoOcean?new window.SailoOcean(this):null}catch(e){console.warn('ocean init',e)}try{this.voy=window.SailoVoyage?new window.SailoVoyage(this):null}catch(e){console.warn('voyage init',e)}
+    if((this.state.gfx||'Auto')==='Auto'){const dm=navigator.deviceMemory||8,hc=navigator.hardwareConcurrency||8;if(dm<=2||hc<=2)this.q=2;else if(dm<=4||hc<=4)this.q=1}else this.applyGfx(this.state.gfx);
     const cv=this.canvasRef.current;this.canvas=cv;this.ctx=cv.getContext('2d');
     this.onResize=()=>{const r=cv.getBoundingClientRect();this.vw=r.width;this.vh=r.height;this.minZ=this.vw/WM*1.2;if(this.map)this.map.resize();this.dpr=Math.min([2,1.5,1][this.q||0],window.devicePixelRatio||1);cv.width=Math.round(this.vw*this.dpr);cv.height=Math.round(this.vh*this.dpr);const m=this.vw<720;if(m!==this.state.mobile)this.setState({mobile:m})};
     window.addEventListener('resize',this.onResize);this.onResize();
@@ -1393,6 +1617,10 @@ class Component extends DCLogic {
     this.layers=[[this.ctx2pat(noiseTex(3,false)),3.2,5,2.4,.13],[this.ctx2pat(noiseTex(9,false)),2.1,-3.5,4.2,.1],[this.ctx2pat(noiseTex(5,true)),4.6,2,-1.5,.12]];
     this.glow=sprite('rgba(255,196,120,1)',64);this.shade=sprite('rgba(4,24,34,1)',128);this.bio=sprite('rgba(120,240,220,1)',32);
   }
+  people(){return PEOPLE}
+  personName(id){const p=BY[id];return p?p.name.split(' ')[0]:'A sailor'}
+  typeOf(k){return TYPES[k]}
+  applyGfx(g){if(g==='High')this.q=0;else if(g==='Low')this.q=2;this.onResize&&this.onResize();const m=this.state.marine||{};if(g==='Low'&&m.q!=='Low')this.setState(x=>({marine:{...x.marine,q:'Low'}}))}
   ctx2pat(c){return document.createElement('canvas').getContext('2d').createPattern(c,'repeat')}
   nearestIsland(x,y){let b=null,bd=1e9;for(const i of this.islands){const d=Math.hypot(i.cx-x,i.cy-y);if(d<bd){bd=d;b=i}}return b}
   nearestComp(x,y){const gx=x/C-.5,gy=y/C-.5;let best=1e9,bi=this.compList[0];for(const i of this.compList){const dx=i%GW-gx,dy=((i/GW)|0)-gy,d=dx*dx+dy*dy;if(d<best){best=d;bi=i}}return bi}
@@ -1416,7 +1644,7 @@ class Component extends DCLogic {
     const r=this.route(me.x,me.y,tx,ty);if(!r){this.toast("There's no water route there. Try another spot.");return}
     if(!isl&&r.snapped&&r.off>40)this.toast("That spot isn't reachable by water — heading to the nearest point you can reach.");
     else if(isl)this.toast(`Setting course for ${isl.name}. You'll anchor just off the shore.`);
-    this.sendBoat(me,r,name,isl&&isl.id);this.follow='me';this.buoy={x:me.dest.x,y:me.dest.y,t0:this.t};this.sfx('pop');if(fromPort){this.gullsUntil=this.t+75;setTimeout(()=>this.sfx('gull'),1400)}
+    this.sendBoat(me,r,name,isl&&isl.id);if(this.voy)this.voy.onCourse(me);this.follow='me';this.buoy={x:me.dest.x,y:me.dest.y,t0:this.t};this.sfx('pop');if(fromPort){this.gullsUntil=this.t+75;setTimeout(()=>this.sfx('gull'),1400)}
     if(this.state.phase==='firstDest'){this.setState({phase:'sailing'});const ahead=(()=>{let need=380,px=me.x,py=me.y;for(const q of r.pts){const L=Math.hypot(q[0]-px,q[1]-py);if(L>=need)return[px+(q[0]-px)*need/L,py+(q[1]-py)*need/L];need-=L;px=q[0];py=q[1]}return[px,py]})();
       const Rd=this.props.discoveryRadius??170;const cand=this.boats.filter(b=>!b.me&&b.presence==='online'&&Math.hypot(b.x-me.x,b.y-me.y)>Rd+20).sort((a,b)=>Math.hypot(a.x-ahead[0],a.y-ahead[1])-Math.hypot(b.x-ahead[0],b.y-ahead[1]))[0];
       if(cand){const rr=this.route(cand.x,cand.y,ahead[0],ahead[1]);if(rr)this.sendBoat(cand,rr,'Open water',null)}}
@@ -1454,7 +1682,7 @@ class Component extends DCLogic {
     this.clouds=[];for(let i=0;i<18;i++){const parts=[];for(let k=0;k<5;k++)parts.push([(R()-.5)*700,(R()-.5)*300,180+R()*220]);this.clouds.push({x:R()*6000,y:R()*6000,parts})}
     this.layers=[[this.ctx2pat(noiseTex(3,false)),3.2,5,2.4,.13],[this.ctx2pat(noiseTex(9,false)),2.1,-3.5,4.2,.1],[this.ctx2pat(noiseTex(5,true)),4.6,2,-1.5,.12]];
     this.glow=sprite('rgba(255,196,120,1)',64);this.shade=sprite('rgba(4,24,34,1)',128);this.bio=sprite('rgba(120,240,220,1)',32)}
-  arrived(b){if(b.me){this.addVoyage();this.celebrate();if(this.buoy)this.buoy.fade=this.t;const isl=b.dest&&b.dest.isl&&this.islands.find(i=>i.id===b.dest.isl);b.at=isl?isl.name:'open water';this.toast(`Anchored ${isl?'off '+isl.name:'in open water'}.`);b.dest=null}else{b.at=b.dest&&b.dest.name!=='Open water'?b.dest.name:null;b.dest=null;b.timer=6+Math.random()*16}}
+  arrived(b){if(b.me){this.addVoyage();this.celebrate();if(this.buoy)this.buoy.fade=this.t;const isl=b.dest&&b.dest.isl&&this.islands.find(i=>i.id===b.dest.isl);let docked=false;if(this.voy)try{docked=this.voy.onArrive(b)}catch(e){console.warn(e)}b.at=docked?b.dest.name:isl?isl.name:'open water';if(!docked)this.toast(`Anchored ${isl?'off '+isl.name:'in open water'}.`);b.dest=null}else{b.at=b.dest&&b.dest.name!=='Open water'?b.dest.name:null;b.dest=null;b.timer=6+Math.random()*16}}
 
   tick=(now)=>{const raw=(now-this.last)/1000,dt=Math.min(0.05,raw);this.last=now;this.t+=dt;this.dtNow=dt;this.qPerf(raw);try{this.update(dt);this.draw();this.placeCard();if(this.state.unlockQ&&this.state.unlockQ.length)this.drawUnlock();if(this.state.oinsp&&this.ocean&&this.oRef.current)try{this.ocean.drawPreview(this.oRef.current,this.state.oinsp.kind,this.t)}catch(e){}const ce=this.compassRef.current;if(ce)ce.style.transform=`rotate(${-this.cam.r}rad)`}catch(e){console.error(e)}this.raf=requestAnimationFrame(this.tick)};
   update(dt){const sm=this.props.sailSpeed??60;const me=this.boatsById.me;if(Math.abs(me.x)>150000||Math.abs(me.y)>150000){this.rebasing=true;this.build();this.rebasing=false}
@@ -1465,7 +1693,7 @@ class Component extends DCLogic {
     if(this.rings&&this.rings.length){for(const r of this.rings)r.a+=dt;this.rings=this.rings.filter(r=>r.a<r.l)}
     if(this.pm)this.meSpd=Math.min(400,Math.hypot(me.x-this.pm[0],me.y-this.pm[1])/Math.max(dt,1e-3));this.pm=[me.x,me.y];
     this.funStep(dt);if(this.ocean)try{this.ocean.update(dt)}catch(e){if(!this.oErr){this.oErr=1;console.warn('ocean',e)}}
-    this.wxUpdate(dt);for(const b of this.boats)this.boatWave(b,dt);if(!this.marine)this.marine=new Marine(this);try{this.marine.update(dt)}catch(e){if(!this.mErr){this.mErr=1;console.warn('marine',e)}}
+    this.wxUpdate(dt);if(this.voy)try{this.voy.update(dt)}catch(e){if(!this.vErr){this.vErr=1;console.warn('voyage',e)}}for(const b of this.boats)this.boatWave(b,dt);if(!this.marine)this.marine=new Marine(this);try{this.marine.update(dt)}catch(e){if(!this.mErr){this.mErr=1;console.warn('marine',e)}}
     if(this.follow){const b=this.boatsById[this.follow];if(b){let o=[0,0];if(!b.me&&this.state.sel===b.id&&!this.state.full)o=this.state.mobile?this.scr2w(0,this.vh*.22,this.camT.z):this.scr2w(this.vw*.13,0,this.camT.z);this.camT.x=b.x+o[0];this.camT.y=b.y+o[1]}}
     const k=1-Math.exp(-dt*this.camK);this.cam.x+=(this.camT.x-this.cam.x)*k;this.cam.y+=(this.camT.y-this.cam.y)*k;this.cam.r+=ang(this.camT.r-this.cam.r)*k;this.cam.p+=(this.camT.p-this.cam.p)*k;this.cam.z=Math.exp(Math.log(this.cam.z)+(Math.log(this.camT.z)-Math.log(this.cam.z))*k);
     const R=this.props.discoveryRadius??170;const near=this.boats.filter(b=>!b.me&&!this.state.blocked[b.id]&&Math.hypot(b.x-me.x,b.y-me.y)<R).sort((a,b)=>Math.hypot(a.x-me.x,a.y-me.y)-Math.hypot(b.x-me.x,b.y-me.y)).map(b=>b.id);
@@ -1477,7 +1705,7 @@ class Component extends DCLogic {
       const boost=b.dest?Math.max(1,Math.hypot(b.dest.x-b.x,b.dest.y-b.y)/BOOSTK):1;b.boost=boost;const ws=b.v*TRAVEL*sm*boost;const tr=T.turn*(0.35+0.65*Math.min(1,b.v/(T.v*.5)))*dt*Math.max(1,ws/25);b.h=ang(b.h+Math.max(-tr,Math.min(tr,diff)));
       tv=T.v*(1-Math.min(.75,Math.abs(diff)/Math.PI*1.5));if(last){tv=Math.min(tv,d/(TRAVEL*sm)*.5+2);if(d<9){b.state='anchored';b.path=[];this.arrived(b)}}}
     const acc=(tv>b.v?T.a:T.a*1.4);b.v+=Math.max(-acc*dt,Math.min(acc*dt,tv-b.v));if(tv===0&&b.v<0.05)b.v=0;
-    const mv=b.v*dt*TRAVEL*sm*(b.state==='sailing'?(b.boost||1):1);const nx=b.x+Math.cos(b.h)*mv,ny=b.y+Math.sin(b.h)*mv;if(this.isLand(nx+Math.cos(b.h)*8,ny+Math.sin(b.h)*8))b.v*=0.9;else{b.x=nx;b.y=ny}
+    const mv=b.v*dt*TRAVEL*sm*(b.state==='sailing'?(b.boost||1):1)*(this.voy&&b.state==='sailing'?this.voy.speedMul(b):1);const nx=b.x+Math.cos(b.h)*mv,ny=b.y+Math.sin(b.h)*mv;if(this.isLand(nx+Math.cos(b.h)*8,ny+Math.sin(b.h)*8))b.v*=0.9;else{b.x=nx;b.y=ny}
     if(b.state!=='sailing'&&b.v<1.5)b.h=ang(b.h+ang(this.wind+Math.PI-b.h)*0.03*dt);
     if(b.v>3){const nb=this.skyNow&&this.skyNow.night>.25&&(!this.bioP||this.bioP.length<520),tcol=T.trail?TRAILC[T.trail]:this.rarOf(b)==='Legendary'?'#ffd678':null,gd=!!tcol&&(!this.goldP||this.goldP.length<260);b.wt+=dt;const cs=Math.cos(b.h),sn=Math.sin(b.h),L=T.len*.5;while(b.wt>.07){b.wt-=.07;const sx=b.x-cs*L,sy=b.y-sn*L;for(const side of[-1,1]){const px=-sn*side,py=cs*side;const tb=this.env?this.env.chop:0,jr=()=>(Math.random()-.5)*b.v*.22*tb;b.wake.push({x:sx+px*3,y:sy+py*3,vx:px*b.v*.22*(1+tb*.5)-cs*b.v*.08+jr(),vy:py*b.v*.22*(1+tb*.5)-sn*b.v*.08+jr(),a:0,r:.6+Math.random()*.9,l:(1.6+b.v/40+Math.random()*.8)*(1-tb*.35)})}b.trail.push({x:sx+(Math.random()-.5)*1.2,y:sy+(Math.random()-.5)*1.2,a:0,r:.8+Math.random()*.5});if(nb){const bp=this.bioP||(this.bioP=[]),hw=T.len*.22;for(let k=0;k<2+(b.v>20?1:0);k++){const o=(Math.random()-.5)*2*hw;bp.push({x:sx-sn*o+(Math.random()-.5)*4,y:sy+cs*o+(Math.random()-.5)*4,a:0,l:1+Math.random()*1.9,r:.9+Math.random()*1.8,f:Math.random()*6.28})}}if(gd)(this.goldP||(this.goldP=[])).push({x:sx+(Math.random()-.5)*8,y:sy+(Math.random()-.5)*8,a:0,l:.8+Math.random()*1.3,r:.8+Math.random()*1.2,f:Math.random()*6.28,col:tcol==='aurora'?['#8fe3b0','#b79cff','#7fd3ff'][Math.floor(Math.random()*3)]:tcol})}}
     if(T.funnel&&b._fun&&(!this.smoke||this.smoke.length<420)){const sm=this.smoke||(this.smoke=[]),e=this.env||{w:10},sb=this.sbNow||1,fu=b._fun,r0=(1.3+Math.random()*.5)*sb*(T.len/30),pv=b._smP;
@@ -1512,7 +1740,7 @@ class Component extends DCLogic {
     const sb=Math.min(4000,Math.max(1,0.5/z));this.sbNow=sb;
     for(const b of this.boats)if(!this.state.blocked[b.id])this.drawWake(c,b,sb,'#ffffff',1);
     if(this.goldP&&this.goldP.length){c.save();c.globalCompositeOperation='lighter';const ts=this.trS||(this.trS={});for(const p of this.goldP){const col=p.col||'#ffd678',spr=ts[col]||(ts[col]=sprite(hexA(col,1),32)),k=p.a/p.l,tw=.5+.5*Math.sin(t*12+p.f);c.globalAlpha=(1-k)*tw;const r=p.r*sb*3;c.drawImage(spr,p.x-r,p.y-r,r*2,r*2)}c.restore()}
-    this.drawBuoy(c,t,sb,night);this.drawBottles(c,t,sb,night);if(this.ocean)try{this.ocean.drawSurface(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.oErr2){this.oErr2=1;console.warn('ocean draw',e)}}if(this.marine)try{this.marine.drawSurface(c,z,t)}catch(e){}
+    this.drawBuoy(c,t,sb,night);this.drawBottles(c,t,sb,night);if(this.ocean)try{this.ocean.drawSurface(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.oErr2){this.oErr2=1;console.warn('ocean draw',e)}}if(this.marine)try{this.marine.drawSurface(c,z,t)}catch(e){}if(this.voy)try{this.voy.drawWorld(c,x0,y0,x1,y1,z,t,night)}catch(e){if(!this.vErr2){this.vErr2=1;console.warn('voyage draw',e)}}
     for(const isl of this.islands)for(const p of isl.parts){if(p.x+p.R*1.5<x0||p.x-p.R*1.5>x1||p.y+p.R*1.5<y0||p.y-p.R*1.5>y1)continue;
       if(!p.deco)p.deco=this.mkDeco(p,isl);this.drawWeeds(c,p,t,z,night);this.drawRocks(c,p,E,true);c.save();c.translate(3,6);c.globalAlpha=.3;c.fillStyle='#0b4352';c.fill(p.sand);c.restore();c.globalAlpha=1;
       c.strokeStyle=isl.rocky?'#8f887b':'#d4a965';c.lineWidth=6;c.stroke(p.sand);c.fillStyle=isl.rocky?'#958e81':'#d2a865';c.fill(p.sand);c.save();c.translate(E.x*2.5,E.y*2.5);c.fillStyle=isl.rocky?'#b9b2a3':'#f1d496';c.fill(p.sand);if(!p.deco.dune)p.deco.dune=poly(p.x-p.R*.03,p.y-p.R*.04,p.R,p.f,.8,0);c.translate(E.x*1.8,E.y*1.8);c.globalAlpha=.8;c.fillStyle=isl.rocky?'#c6c0b2':'#fae6b8';c.fill(p.deco.dune);c.globalAlpha=1;c.restore();
@@ -1523,7 +1751,7 @@ class Component extends DCLogic {
     const me=this.boatsById.me;
     if(this.state.nearbyOn){const R=this.props.discoveryRadius??170;c.globalAlpha=1;c.fillStyle='rgba(95,212,196,.07)';c.beginPath();c.arc(me.x,me.y,R,0,6.283);c.fill();c.strokeStyle='rgba(95,212,196,.6)';c.lineWidth=1.5/z;c.setLineDash([6/z,6/z]);c.lineDashOffset=-t*8/z;c.stroke();c.setLineDash([])}
     const sorted=this.boats.filter(b=>!this.state.blocked[b.id]).map(b=>({b,d:this.toScreen(b.x,b.y).y})).sort((a,b)=>a.d-b.d).map(o=>o.b);
-    for(const b of sorted){c.globalAlpha=((b.me&&this.state.vis==='hidden')?.55:(b.presence==='parked'?.85:1))*this.fogA(b);this.drawBoat(c,b,t,sb)}c.globalAlpha=1;this.drawSmoke(c,night);this.drawJumps(c,t);this.drawSpray(c);this.drawBirds(c,sb,night);
+    for(const b of sorted){c.globalAlpha=((b.me&&this.state.vis==='hidden')?.55:(b.presence==='parked'?.85:1))*this.fogA(b);this.drawBoat(c,b,t,sb)}c.globalAlpha=1;this.drawSmoke(c,night);if(this.voy)try{this.voy.drawFx(c)}catch(e){}this.drawJumps(c,t);this.drawSpray(c);this.drawBirds(c,sb,night);
     this.drawClouds(c,x0,y0,x1,y1,night);
     {const e=this.env;const dim=Math.max(0,(e.cloud-35)/65)*.3+e.rain*.1+e.storm*.3+e.snow*.06;{const rgb=s=>{if(s[0]==='#'){const n=parseInt(s.slice(1),16);return[n>>16,n>>8&255,n&255]}const m=s.match(/[\d.]+/g)||[255,255,255];return m.slice(0,3).map(Number)};let f=[1,1,1];const mix=(col,a)=>{const q=rgb(col);f=f.map((v,i)=>v*(1-a+a*q[i]/255))};if(dim>.01)mix(e.storm>.5?'#56667a':e.cold>.5?'#9db2c9':'#8796a1',Math.min(.75,dim));if(S.a>0.01)mix(S.col,S.a);const fc='rgb('+f.map(v=>Math.round(v*255)).join(',')+')',mc='rgb('+f.map(v=>Math.round(Math.max(.72,Math.pow(v,.35))*255)).join(',')+')';if(this.tintDiv&&this.tintDiv.__c!==mc){this.tintDiv.style.background=mc;this.tintDiv.__c=mc}if(f[0]<.995||f[1]<.995||f[2]<.995){if(this.mapReady){c.globalCompositeOperation='source-atop';c.globalAlpha=Math.min(.6,1-(f[0]+f[1]+f[2])/3);c.fillStyle='#03121c';c.fillRect(x0,y0,x1-x0,y1-y0)}else{c.globalCompositeOperation='multiply';c.globalAlpha=1;c.fillStyle=fc;c.fillRect(x0,y0,x1-x0,y1-y0)}c.globalCompositeOperation='source-over';c.globalAlpha=1}}if(this.flash>0){c.globalCompositeOperation='lighter';c.globalAlpha=this.flash*.3;c.fillStyle='#c9d6ff';c.fillRect(x0,y0,x1-x0,y1-y0);c.globalCompositeOperation='source-over'}}c.globalAlpha=1;
     if(night>0.02){c.globalCompositeOperation='lighter';
@@ -1537,6 +1765,7 @@ class Component extends DCLogic {
       if(night>.25){const nk=Math.min(1,(night-.25)/.5);if(this.bioP)for(const p of this.bioP){const k=p.a/p.l,fl=.55+.45*Math.sin(t*9+p.f);c.globalAlpha=nk*(1-k)*fl*.95;const r=p.r*sb*(1+k*.7)*2.4;c.drawImage(this.bio,p.x-r,p.y-r,r*2,r*2)}
         for(const g of this.glowPts){c.globalAlpha=Math.min(1,g[3]*nk);c.drawImage(this.bio,g[0]-g[2],g[1]-g[2],g[2]*2,g[2]*2)}}
       if(this.ocean)try{this.ocean.drawGlow(c,night)}catch(e){}
+      if(this.voy)try{this.voy.drawGlow(c,night)}catch(e){}
       c.globalCompositeOperation='source-over'}
     c.globalAlpha=1;
     if(me.state==='sailing'&&me.path.length&&!this.state.photo){c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=2/z;c.setLineDash([6/z,9/z]);c.lineDashOffset=-t*24/z;c.beginPath();c.moveTo(me.x,me.y);for(let k=me.pi;k<me.path.length;k++)c.lineTo(me.path[k][0],me.path[k][1]);c.stroke();c.setLineDash([])}
@@ -1546,7 +1775,7 @@ class Component extends DCLogic {
     {const gH=this.golden(S.p)*(1-Math.min(.8,this.env.cloud/120))*(1-this.env.fog*.6);if(gH>.01){const dawn=S.p<.5;c.globalCompositeOperation='soft-light';const g=c.createLinearGradient(0,0,0,vh);g.addColorStop(0,`rgba(255,${dawn?150:118},${dawn?110:80},${Math.min(1,1.0*gH).toFixed(3)})`);g.addColorStop(.6,`rgba(255,${dawn?180:150},${dawn?150:110},${(.45*gH).toFixed(3)})`);g.addColorStop(1,`rgba(255,200,170,${(.2*gH).toFixed(3)})`);c.fillStyle=g;c.fillRect(0,0,vw,vh);
       c.globalCompositeOperation='screen';const r=c.createRadialGradient(vw*.2,0,0,vw*.2,0,Math.max(vw,vh)*.75);r.addColorStop(0,`rgba(255,${dawn?170:130},${dawn?120:90},${(.42*gH).toFixed(3)})`);r.addColorStop(1,'rgba(255,140,90,0)');c.fillStyle=r;c.fillRect(0,0,vw,vh);c.globalCompositeOperation='source-over'}}
     if(night<.9){c.globalCompositeOperation='soft-light';c.globalAlpha=(1-night)*.5*(1-((this.W2||{}).cloud||0)/130);const g=c.createRadialGradient(vw*.15,vh*.1,0,vw*.15,vh*.1,Math.max(vw,vh)*.7);g.addColorStop(0,'rgba(255,240,210,1)');g.addColorStop(1,'rgba(255,240,210,0)');c.fillStyle=g;c.fillRect(0,0,vw,vh);c.globalCompositeOperation='source-over';c.globalAlpha=1}
-    this.drawAtmos(c,vw,vh,night);
+    this.drawAtmos(c,vw,vh,night);if(this.voy)try{this.voy.drawSky(c,vw,vh,night)}catch(e){}
     if(!this.buoy&&!this.state.photo&&me.state==='sailing'&&me.dest){const s=this.toScreen(me.dest.x,me.dest.y);const f=(t*.8)%1;c.strokeStyle=`rgba(255,255,255,${1-f})`;c.lineWidth=2;c.beginPath();c.arc(s.x,s.y,8+f*22,0,6.283);c.stroke();c.fillStyle='#ff7a59';c.strokeStyle='#fff';c.lineWidth=2.5;c.beginPath();c.arc(s.x,s.y,6,0,6.283);c.fill();c.stroke()}
     if(z<2.8){c.textAlign='center';c.textBaseline='middle';for(const isl of this.islands){if(isl.R*z<20&&z>.2)continue;const s=this.toScreen(isl.cx,isl.cy);if(s.x<-100||s.x>vw+100||s.y<-50||s.y>vh+50)continue;const al=Math.min(1,(2.8-z)*2)*(z<.2?.85:1);c.globalAlpha=al;c.shadowColor='rgba(0,0,0,.45)';c.shadowBlur=8;c.fillStyle='#fffaf0';c.font=z<.2?'600 9.5px Geist, sans-serif':'600 11px Geist, sans-serif';try{c.letterSpacing=z<.2?'1.2px':'2.5px'}catch(e){}c.fillText(isl.name.toUpperCase(),s.x,s.y+(z<.2?Math.max(8,isl.R*z*1.1+8):0));if(z>.85){try{c.letterSpacing='0px'}catch(e){}c.font='italic 14px "Instrument Serif", serif';c.fillText(isl.kind,s.x,s.y+16)}c.shadowBlur=0}try{c.letterSpacing='0px'}catch(e){}c.globalAlpha=1}
     if(z<.75&&this.seas&&!this.mapReady){c.textAlign='center';c.textBaseline='middle';c.font='italic 20px "Instrument Serif", serif';try{c.letterSpacing='3px'}catch(e){}c.shadowColor='rgba(0,30,40,.5)';c.shadowBlur=6;c.fillStyle='#d8f1f4';
@@ -1556,7 +1785,7 @@ class Component extends DCLogic {
         c.fillStyle='#ffffff';c.strokeStyle='#10232c';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,3.6,0,6.283);c.fill();c.stroke();
         c.font='500 12px Geist, sans-serif';const dx=l.x-p.x;c.textAlign=dx>12?'left':dx<-12?'right':'center';const w=c.measureText(ct.name).width+12;const bx=c.textAlign==='left'?l.x:c.textAlign==='right'?l.x-w:l.x-w/2;
         c.fillStyle='rgba(10,27,36,.72)';c.beginPath();c.roundRect(bx,l.y-10,w,20,10);c.fill();c.fillStyle='#f4efe6';c.fillText(ct.name,c.textAlign==='left'?l.x+6:c.textAlign==='right'?l.x-6:l.x,l.y+.5)}}c.globalAlpha=1}
-    this.drawBubbles(c,sorted,z,t,sb);if(this.ocean&&!this.state.photo)try{this.ocean.drawHud(c,t)}catch(e){}
+    this.drawBubbles(c,sorted,z,t,sb);if(this.ocean&&!this.state.photo)try{this.ocean.drawHud(c,t)}catch(e){}if(this.voy)try{this.voy.drawHud(c)}catch(e){}
   }
   golden(p){const b=(c,w)=>Math.max(0,1-Math.abs(p-c)/w);return Math.min(1,Math.max(b(.275,.075),b(.725,.085)))}
   drawSwell(c,x0,y0,x1,y1,z,t,night){const q=this.q||0;if(q>=2||!this.wcA||!this.env)return;const e=this.env;
@@ -1589,7 +1818,7 @@ class Component extends DCLogic {
       const a=ph<.12?ph/.12:Math.pow(1-(ph-.12)/.88,1.6);if(a<.08)continue;const x=(ix+fr(Math.sin(n*12.9898+i*4.1+ix*.7)*43758.5453))*T,y=(iy+fr(Math.sin(n*78.233+i*2.3+iy*.9)*24634.6345))*T;
       const r=Math.max(.9/z,(2.2+o.s*2.8)*f*.6)*(.6+.4*dens),b=P[a>.66?2:a>.33?1:0];for(let j=-1;j<=1;j++){const ox=cs*r*1.4*j,oy=sn*r*1.4*j,rr=r*(1-Math.abs(j)*.35);b.moveTo(x+ox+cs*rr*1.3,y+oy+sn*rr*1.3);b.ellipse(x+ox,y+oy,rr*1.3,rr*.7,wd,0,6.283)}}}
     c.fillStyle=night>.5?'#cfe0f5':'#ffffff';for(let k=0;k<3;k++){c.globalAlpha=(.3+k*.25)*(.55+.45*dens);c.fill(P[k])}c.globalAlpha=1}
-  qPerf(raw){if(!(raw>0&&raw<1))return;this.ft=(this.ft??raw)*.94+raw*.06;this.qT=(this.qT||0)+raw;if(this.qT<2.5)return;this.qT=0;const q=this.q||0;let n=q;if(this.ft>1/26&&q<2)n=q+1;else if(this.ft<1/57&&q>0&&(this.qUp=(this.qUp||0)+1)>3){n=q-1;this.qUp=0}if(n!==q){this.q=n;this.onResize&&this.onResize()}}
+  qPerf(raw){if(!(raw>0&&raw<1))return;if(this.state.gfx==='High'||this.state.gfx==='Low')return;this.ft=(this.ft??raw)*.94+raw*.06;this.qT=(this.qT||0)+raw;if(this.qT<2.5)return;this.qT=0;const q=this.q||0;let n=q;if(this.ft>1/26&&q<2)n=q+1;else if(this.ft<1/57&&q>0&&(this.qUp=(this.qUp||0)+1)>3){n=q-1;this.qUp=0}if(n!==q){this.q=n;this.onResize&&this.onResize()}}
   drawGlints(c,x0,y0,x1,y1,z,t,night){if((this.q||0)>=2)return;const f=Math.max(1,Math.pow(2,Math.ceil(Math.log2(0.8/z))));const T=420*f;c.strokeStyle=night>.5?'#cfe6ff':'#ffffff';c.lineWidth=1.5/z;const al=(.55+.35*(1-night))*(this.glintK??1);
     const ix0=Math.floor(x0/T),ix1=Math.floor(x1/T),iy0=Math.floor(y0/T),iy1=Math.floor(y1/T);for(let ix=ix0;ix<=ix1;ix++)for(let iy=iy0;iy<=iy1;iy++)for(const g of this.glints){const a=Math.sin(t*g.s+g.p+ix*1.3+iy*2.1);if(a<.55)continue;const jh=Math.sin(ix*12.9898+iy*78.233)*43758.5453,jx=jh-Math.floor(jh);const gx=ix*T+(((g.x+jx)%1*T+t*4*f)%T),gy=iy*T+((g.y+jx*3.7)%1)*T;const len=(4+g.l*6)/z;c.globalAlpha=(a-.55)/.45*al;c.beginPath();c.moveTo(gx-len,gy);c.quadraticCurveTo(gx,gy-len*.4,gx+len,gy);c.stroke()}c.globalAlpha=1}
   drawWake(c,b,s,col,mul){if(!b.wake.length&&!b.trail.length)return;const tr=b.trail,n=tr.length;c.lineCap='round';
@@ -1701,7 +1930,7 @@ class Component extends DCLogic {
   drawSmoke(c,night){if(!this.smoke||!this.smoke.length)return;const E=this.E,e=this.env||{};if(!this.smokeD){this.smokeD=sprite('rgba(46,44,44,1)',64);this.smokeL=sprite('rgba(150,152,156,1)',64)}c.save();const lit=1-night*.45;
     // Each puff starts small and dense at the funnel, then billows out, lightens and thins as it drifts downwind.
     for(const p of this.smoke){const k=p.a/p.l,g=1-Math.pow(1-k,2.2),r=p.r*(1+g*5),x=p.x+E.x*p.z,y=p.y+E.y*p.z,fin=Math.min(1,p.a*6),al=fin*Math.pow(1-k,1.35)*.34*(1-(e.rain||0)*.4)*lit;if(al<.006)continue;
-      const dk=Math.max(0,1-k*3)*(.6+p.sh*.3);c.globalAlpha=al*dk;c.drawImage(this.smokeD,x-r,y-r,r*2,r*2);c.globalAlpha=al*(1-dk)*.8;c.drawImage(this.smokeL,x-r*1.15,y-r*1.15,r*2.3,r*2.3)}c.restore();c.globalAlpha=1}
+      const dk=Math.max(0,1-k*3)*(.6+p.sh*.3);c.globalAlpha=al*dk;c.drawImage(this.smokeD,x-r,y-r,r*2,r*2);c.globalAlpha=al*(1-dk)*.8;c.drawImage(this.smokeL,x-r*1.15,y-r*1.15,r*2.3,r*2.3);if(night>.4){if(!this.smokeM)this.smokeM=sprite('rgba(170,195,230,1)',64);c.globalAlpha=al/lit*night*.35*(1-k*.5);c.drawImage(this.smokeM,x-r*.9+r*.25,y-r*.9-r*.3,r*1.8,r*1.8)}}c.restore();c.globalAlpha=1}
   boatThumb(f,locked){const k=f.id+(locked?':l':'');const cache=this.bthumbs||(this.bthumbs={});if(cache[k]!=null)return cache[k];const W=220,Hc=140,cv=document.createElement('canvas');cv.width=W;cv.height=Hc;const c=cv.getContext('2d'),T=TYPES[f.type];
     const sc=W/(Math.pow(T.len,.55)*Math.pow(78,.45)*1.45);const fake={id:'__t'+f.id,x:0,y:0,h:-.5,type:f.type,color:f.color,ph:1.3,v:0,state:'sailing',wv:{h:0,p:0,r:0},wake:[],trail:[],rar:f.rarity,ancK:0,noShadow:true,thumb:true};
     const E0=this.E,env=this.env,ac=env&&env.acc,ra=env&&env.rain;this.E={x:0,y:-.78};if(env){env.acc=0;env.rain=0}try{c.setTransform(sc,0,0,sc,W/2,Hc*.76);this.drawBoat(c,fake,1.2,1)}catch(e){}this.E=E0;if(env){env.acc=ac;env.rain=ra}
@@ -1754,9 +1983,10 @@ class Component extends DCLogic {
     for(const m of order){if(T.rig!=='crab')line(P(m.x,0,Hh),P(m.x,0,Hh+m.h),'#3f2716',1.8*s);
       if(T.rig==='sq'||T.rig==='mat'){const tiers=T.tiers||1,yard=(z,hw,e,fw)=>[m.x-Math.sin(brace)*hw*e+(fw||0),Math.cos(brace)*hw*e,z];
         for(let k=0;k<tiers;k++){const zt=Hh+m.h*(.95-k*(.85/tiers)),zb=Hh+m.h*(.95-(k+1)*(.85/tiers))+m.h*.04,hw=w*(1.1+k*.3)*(tiers>=3?1:1.1)*(T.rig==='mat'?1.2:1);
-          const a=P(...yard(zt,hw,-1)),q=P(...yard(zt,hw,1)),d=P(...yard(zb,hw*1.04,1)),e=P(...yard(zb,hw*1.04,-1)),ct=P(...yard(zt,0,1,hw*.12*bil)),cb=P(...yard(zb,0,1,hw*.55*bil));
+          const a=P(...yard(zt,hw,-1)),q=P(...yard(zt,hw,1)),d=P(...yard(zb,hw*1.04,1)),e=P(...yard(zb,hw*1.04,-1)),ct=P(...yard(zt,0,1,hw*.2*bil)),cb=P(...yard(zb,0,1,hw*.85*bil));
           c.fillStyle=sc;c.beginPath();c.moveTo(...a);c.quadraticCurveTo(...ct,...q);c.lineTo(...d);c.quadraticCurveTo(...cb,...e);c.closePath();c.fill();
-          if(T.vstripe){c.save();c.clip();c.strokeStyle=T.vstripe;c.lineWidth=hw*.32;for(const f of[-.55,0,.55]){c.beginPath();c.moveTo(...P(...yard(zt,hw*f,1)));c.lineTo(...P(...yard(zb,hw*f,1,hw*.4*bil)));c.stroke()}c.restore()}
+          {c.save();c.clip();const mid=P(...yard((zt*.4+zb*.6),0,1,hw*.62*bil));c.globalAlpha=.22;c.fillStyle='#ffffff';c.beginPath();c.ellipse(mid[0],mid[1],hw*.55,Math.max(1,Math.abs(zt-zb)*.22),0,0,6.283);c.fill();c.restore()}
+          if(T.vstripe){c.save();c.clip();c.globalAlpha=.55;c.strokeStyle=T.vstripe;c.lineWidth=hw*.2;for(const f of[-.55,0,.55]){c.beginPath();c.moveTo(...P(...yard(zt,hw*f,1)));c.lineTo(...P(...yard(zb,hw*f,1,hw*.4*bil)));c.stroke()}c.restore()}
           if(T.rig==='mat'){c.strokeStyle='rgba(120,90,40,.45)';c.lineWidth=.5*s;for(let i=1;i<4;i++){const zz=zt+(zb-zt)*i/4;c.beginPath();c.moveTo(...P(...yard(zz,hw,-1)));c.lineTo(...P(...yard(zz,hw,1)));c.stroke()}}
           c.fillStyle='rgba(90,70,50,.14)';c.beginPath();const mt=P(...yard((zt+zb)/2,hw,-1)),mb=P(...yard((zt+zb)/2,hw,1));c.moveTo(...mt);c.lineTo(...mb);c.lineTo(...d);c.quadraticCurveTo(...cb,...e);c.closePath();c.fill();
           if(rk>=1&&k===tiers-1){const zs=zt+(zb-zt)*.72;c.strokeStyle=RARC[rar];c.lineWidth=1.3*s;c.beginPath();c.moveTo(...P(...yard(zs,hw,-1,hw*.35*bil)));c.quadraticCurveTo(...P(...yard(zs,0,1,hw*.45*bil)),...P(...yard(zs,hw,1,hw*.35*bil)));c.stroke()}
@@ -1819,7 +2049,7 @@ class Component extends DCLogic {
   hover(p){const b=this.hitBoat(p.x,p.y);this.canvas.style.cursor=b?'pointer':'grab'}
   zoomAt(sx,sy,nz,now){nz=Math.max(this.minZ||.03,Math.min(3.4,nz));if(!this.follow){const w=this.toWorld(sx,sy);const v=this.scr2w(sx-this.vw/2,sy-this.vh/2,nz);this.camT.x=w.x-v[0];this.camT.y=w.y-v[1];}this.camT.z=nz;if(now){this.cam.z=nz;if(!this.follow){this.cam.x=this.camT.x;this.cam.y=this.camT.y}}}
   hitBoat(sx,sy){if(!this.screenPos)return null;let best=null,bd=26;for(const id in this.screenPos){const p=this.screenPos[id];let d=Math.hypot(p.x-sx,p.y-sy);if(p.by!=null)d=Math.min(d,Math.hypot(p.bx-sx,p.by-sy),Math.hypot(p.x-sx,(p.y+p.by)/2-sy));if(d<bd){bd=d;best=this.boatsById[id]}}return best}
-  tap(sx,sy){const st=this.state;if(st.phase==='intro'||st.loggedOut||st.photo)return;if(this.ocean&&!st.journalOpen){const ob=this.ocean.hit(sx,sy);if(ob){this.ocean.open(ob);return}}const bh=(this.bottles||[]).find(b=>!b.mine&&b.sx!=null&&Math.hypot(b.sx-sx,b.sy-sy)<28);if(bh){this.openBottle(bh);return}const hit=this.hitBoat(sx,sy);
+  tap(sx,sy){const st=this.state;if(st.phase==='intro'||st.loggedOut||st.photo)return;if(this.voy&&this.voy.hit(sx,sy))return;if(this.ocean&&!st.journalOpen){const ob=this.ocean.hit(sx,sy);if(ob){this.ocean.open(ob);return}}const bh=(this.bottles||[]).find(b=>!b.mine&&b.sx!=null&&Math.hypot(b.sx-sx,b.sy-sy)<28);if(bh){this.openBottle(bh);return}const hit=this.hitBoat(sx,sy);
     if(hit){if(hit.me){this.myBoat();return}this.select(hit.id);return}
     if(st.sel||st.visOpen||st.meOpen||st.searchOpen||st.camOpen||st.fleetOpen||st.journalOpen){this.setState({sel:null,full:false,visOpen:false,meOpen:false,searchOpen:false,camOpen:false,fleetOpen:false,journalOpen:false});if(this.follow!=='me')this.follow=null;return}
     if(st.phase==='customize'||st.phase==='locate')return;const w=this.toWorld(sx,sy);this.audioCtx(this.state.sfx!==false);(this.rings||(this.rings=[])).push({x:w.x,y:w.y,a:0,l:1,r:34*(this.sbNow||1)});if(this.marine)this.marine.poke(w.x,w.y,140*(this.sbNow||1));this.setDest(w.x,w.y)}
@@ -1935,7 +2165,7 @@ class Component extends DCLogic {
     else if(kind==='shutter'){noise(n,.05,.5,'highpass',2500);noise(n+.09,.04,.35,'highpass',3200)}}
   hail(id,icon){const me=this.boatsById.me,b=this.boatsById[id];if(!b)return;const d=Math.hypot(b.x-me.x,b.y-me.y),R=(this.props.discoveryRadius??170)*2.2,nm=BY[id].name.split(' ')[0];
     if(d>R){this.toast(`Sail closer to hail ${nm} · ${(d*5/1000).toFixed(1)} km away.`);return}if(Date.now()-(this.lastHail||0)<1200)return;this.lastHail=Date.now();
-    this.flare('me',icon);if(icon==='📯'){this.sfx('horn');this.vib(80)}else{this.sfx('pop');this.vib(15)}
+    this.flare('me',icon);if(this.voy)this.voy.onHail(id);if(icon==='📯'){this.sfx('horn');this.vib(80)}else{this.sfx('pop');this.vib(15)}
     const rep=icon==='📯'?['📯','👋']:icon==='👋'?['👋','😄','⛵']:icon==='⚓'?['⚓','👍']:['🐬','😮','🌊'];
     setTimeout(()=>{if(!this.boatsById[id]||this.state.blocked[id])return;const r=rep[Math.floor(Math.random()*rep.length)];this.flare(id,r);if(r==='📯')this.sfx('horn');else this.sfx('pop');this.toast(`${nm} ${r==='📯'?'sounded their horn back':r==='👋'?'waved back':'replied '+r}`)},1100+Math.random()*900)}
   flare(id,icon){(this.flares||(this.flares=[])).push({id,icon,t0:this.t})}
@@ -1945,7 +2175,7 @@ class Component extends DCLogic {
     if(live&&st.phase==='free'&&!st.photo){this.bottleT=(this.bottleT??22)-dt;if(this.bottleT<=0){this.bottleT=55+Math.random()*60;if((this.bottles||[]).filter(b=>!b.mine).length<2)this.spawnBottle()}}
     const M=this.marine;if(!M||!M.cfg().on||!live)return;
     if(this.cam.z>.35&&!st.photo){this.breachT=(this.breachT??(50+Math.random()*50))-dt;if(this.breachT<=0){this.breachT=110+Math.random()*150;this.spawnBreach()}}
-    if(me.state==='sailing'&&me.v>18&&this.t>(this.dolphT??30)){this.dolphT=this.t+70+Math.random()*80;const zn=M.zoneAt(me.x,me.y);if(zn.z!=='cold'){const ax=me.x+Math.cos(me.h)*120*sb,ay=me.y+Math.sin(me.h)*120*sb;if(M.isWater(ax,ay)!==false){const n0=M.g.length;M.make('dolphin',ax,ay,M.habAt(ax,ay,zn.z),zn,M.cfg());const g=M.g[n0];if(g){g.follow=me;g.folT=40;g.side=Math.random()<.5?-1:1;g.met[me.id]=this.t+60}}}}
+    if(me.state==='sailing'&&me.v>14&&this.t>(this.dolphT??25)){this.dolphT=this.t+45+Math.random()*50;const zn=M.zoneAt(me.x,me.y);if(zn.z!=='cold'){const ax=me.x+Math.cos(me.h)*120*sb,ay=me.y+Math.sin(me.h)*120*sb;if(M.isWater(ax,ay)!==false){const n0=M.g.length;M.make('dolphin',ax,ay,M.habAt(ax,ay,zn.z),zn,M.cfg());const g=M.g[n0];if(g){g.follow=me;g.folT=40;g.side=Math.random()<.5?-1:1;g.met[me.id]=this.t+60}}}}
     for(const g of M.g)if(g.k==='dolphin'&&g.follow&&g.follow.me&&g.fade>.6&&g.f.length&&Math.random()<dt*.6){const f=g.f[Math.floor(Math.random()*g.f.length)];(this.jumps||(this.jumps=[])).push({x:f.x,y:f.y,h:f.h,t0:this.t,len:16*f.sc,T:.9,D:16*2.4,Zp:16*.75,col:'#5d6f7a'})}}
   spawnBreach(){const me=this.boatsById.me,sb=this.sbNow||1;for(let i=0;i<6;i++){const a=me.h+(Math.random()-.5)*1.6,d=(170+Math.random()*120)*sb,x=me.x+Math.cos(a)*d,y=me.y+Math.sin(a)*d,h=Math.random()*6.283,L=88*sb;if(this.isLand(x,y)||this.isLand(x+Math.cos(h)*L*1.4,y+Math.sin(h)*L*1.4)||this.marine.isWater(x,y)===false)continue;(this.jumps||(this.jumps=[])).push({x,y,h,t0:this.t,len:L,T:2.3,D:L*1.25,Zp:L*.5,col:'#2e4350',big:true});if(!this.breachSeen){this.breachSeen=1;setTimeout(()=>this.toast('A humpback just breached off your bow!'),700)}return}}
   drawJumps(c,t){if(!this.jumps||!this.jumps.length)return;const E=this.E;this.jumps=this.jumps.filter(j=>t-j.t0<j.T+1.4);
@@ -2083,14 +2313,14 @@ class Component extends DCLogic {
     try{this.applyGame(await this.A.loadGame(u.id))}catch(e){}if(this.ocean)this.ocean.load();
     if(!prof.onboarding_completed){this.setState({authView:'onbProfile',onb:true,phase:'intro',aerr:{},af:{disp:prof.display_name||this.state.me.name||'',user:prof.username||'',bio:prof.bio||''}});if(prof.username)this.checkUname(prof.username);return}
     if(prof.display_name&&!this.state.me.name)this.setState({me:{...this.state.me,name:prof.display_name}});this.enterWorld(false)}finally{this.authing=false}}
-  applyGame(g){if(!g)return;const st=g.state||{},fl=g.fleet,patch={};['me','vis','likes','friends','convos','unread','blocked','marine','mLikes','mComments','notif','disc','todMode','pins'].forEach(k=>{if(st[k]!=null)patch[k]=st[k]});if(patch.me)patch.me=migMe(patch.me);
+  applyGame(g){if(!g)return;const st=g.state||{},fl=g.fleet,patch={};['me','vis','likes','friends','convos','unread','blocked','marine','mLikes','mComments','notif','disc','todMode','pins','voy','gfx'].forEach(k=>{if(st[k]!=null)patch[k]=st[k]});if(patch.me)patch.me=migMe(patch.me);if(patch.voy&&this.voy)this.voy.reload(patch.voy);
     if(fl)patch.fleet={...this.state.fleet,owned:fl.owned&&fl.owned.length?fl.owned:['drifter'],streak:fl.streak||0,best:fl.best||0,last:fl.last_day||null,voyages:fl.voyages||0};
     if(fl&&fl.active){const b=FLEET.find(x=>x.id===fl.active),m=patch.me||this.state.me;if(b&&m.boat!==b.id)patch.me={...m,boat:b.id,type:b.type,color:b.color}}
     if(st.loc)patch.loc=st.loc;if(st.dest)this.parkDest=st.dest;
     this.setState(patch,()=>{if(!st.loc&&!st.pos)return;const ok=st.pos&&st.pos.every&&st.pos.every(Number.isFinite);this.saved={...(this.saved||{}),pos:ok?st.pos:null,at:st.at||null};const L=this.state.loc;this.startG=ok?[st.pos[0],st.pos[1]]:ll2w(L.lon,L.lat);this.boats=null;this.boatsById=null;this.nearKey='';this.build();this.follow='me';const me=this.boatsById.me;Object.assign(this.cam,{x:me.x,y:me.y});Object.assign(this.camT,{x:me.x,y:me.y});this.fetchWeather();this.loadMapbox();this.uiTick()})}
-  gameSnapshot(){const s=this.state,me=this.boatsById&&this.boatsById.me;return{me:s.me,loc:s.loc,pos:me?[me.x+OX,me.y+OY,me.h]:null,dest:me&&me.state==='sailing'&&me.dest?me.dest:null,at:me?me.at:null,vis:s.vis,disc:s.disc,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,marine:s.marine,mLikes:s.mLikes,mComments:s.mComments,notif:s.notif,todMode:s.todMode,pins:s.pins,fleet:this.isReal()?undefined:s.fleet}}
+  gameSnapshot(){const s=this.state,me=this.boatsById&&this.boatsById.me;return{me:s.me,loc:s.loc,pos:me?[me.x+OX,me.y+OY,me.h]:null,dest:me&&me.state==='sailing'&&me.dest?me.dest:null,at:me?me.at:null,vis:s.vis,disc:s.disc,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,marine:s.marine,mLikes:s.mLikes,mComments:s.mComments,notif:s.notif,todMode:s.todMode,pins:s.pins,voy:s.voy,gfx:s.gfx,fleet:this.isReal()?undefined:s.fleet}}
   remoteSave(force){const s=this.state,u=s.auth&&s.auth.user;if(!this.A||!u||!u.verified||(s.authView&&!force))return;const now=Date.now();if(!force&&now-(this.lastRS||0)<15000)return;this.lastRS=now;try{this.A.saveGame(u.id,this.gameSnapshot())}catch(e){}}
-  enterWorld(first){this.setState({authView:null,phase:first?'firstDest':'free',onboarded:true},()=>this.save());this.follow='me';this.camT.z=first?1.2:Math.max(this.camT.z,1.2);this.camK=1.2;setTimeout(()=>this.camK=3,2500);if(!first){this.scheduleRequest();if(this.parkDest&&!this.state.loggedOut)this.setState({resume:this.parkDest})}}
+  enterWorld(first){this.setState({authView:null,phase:first?'firstDest':'free',onboarded:true},()=>this.save());if(this.voy&&!first)setTimeout(()=>this.voy.onEnter(),1500);this.follow='me';this.camT.z=first?1.2:Math.max(this.camT.z,1.2);this.camK=1.2;setTimeout(()=>this.camK=3,2500);if(!first){this.scheduleRequest();if(this.parkDest&&!this.state.loggedOut)this.setState({resume:this.parkDest})}}
   checkUname(u){clearTimeout(this.unT);const err=unameErr(u);if(err){this.setState({uname:{st:'bad',msg:u?err:''}});return}this.setState({uname:{st:'checking',msg:'Checking @'+u+'…'}});
     this.unT=setTimeout(async()=>{let ok=null;try{ok=await this.A.available(u)}catch(e){}if((this.state.af.user||'')!==u)return;this.setState({uname:ok===null?{st:'unknown',msg:"Couldn't check right now. We'll confirm when you continue."}:ok?{st:'ok',msg:'@'+u+' is available'}:{st:'taken',msg:'That username is taken.'}})},400)}
   prevent(e){if(e&&e.preventDefault)e.preventDefault()}
@@ -2176,7 +2406,7 @@ class Component extends DCLogic {
       streakN:String(s.dStreak??streak),numAnim:s.numPop?((s.numPop%2?'loNumA':'loNumB')+' .4s cubic-bezier(.2,.8,.2,1)'):'none',pillAnim:s.pillGlow?((s.pillGlow%2?'loGlowA':'loGlowB')+' 1.3s ease 2'):'none',pillPlus:!!s.pillPlus,pillPlusText:s.pillPlus||'',streakWord:streak===1?'day streak':'day streak',streakBest:'Best '+f.best+' · '+(s.dVoy??(f.voyages||0))+' voyage'+((s.dVoy??(f.voyages||0))===1?'':'s'),canClaim:!claimed,claimed,claimDay:this.claimDay,claimLabel:f.last===y?'Finish a voyage today to keep your '+f.streak+'-day streak.':'Finish a voyage today to start a streak.',streakDot:!claimed,days,
       fleetRows:rows,fleetCount:f.owned.length+' of '+FLEET.length+' boats',hasNext:!!next,nextLine:next?next.b.name+' · '+next.gap+' more '+(next.b.req[0]==='streak'?'streak day':'voyage')+(next.gap===1?'':'s'):'',curBoat:cur?cur.name:'Custom '+TYPES[s.me.type].label.toLowerCase()}}
   save(){this.remoteSave();this.save0()}
-  save0(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const s=this.state;if(s.phase==='intro'&&!s.onboarded)return;try{localStorage.setItem(KEY,JSON.stringify({loc:s.loc,mLikes:s.mLikes,mComments:s.mComments,onboarded:s.onboarded,me:s.me,pos:[me.x+OX,me.y+OY,me.h],dest:me.state==='sailing'&&me.dest?me.dest:(s.loggedOut||s.loggingOut?this.parkDest:null)||null,at:me.at,vis:s.vis,disc:s.disc,loggedOut:s.loggedOut||s.loggingOut,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,wxMode:s.wxMode,wxWind:s.wxWind,fleet:s.fleet,marine:s.marine,notif:s.notif,sfx:s.sfx,todMode:s.todMode,pins:s.pins}))}catch(e){}}
+  save0(){const me=this.boatsById&&this.boatsById.me;if(!me)return;const s=this.state;if(s.phase==='intro'&&!s.onboarded)return;try{localStorage.setItem(KEY,JSON.stringify({loc:s.loc,mLikes:s.mLikes,mComments:s.mComments,onboarded:s.onboarded,me:s.me,pos:[me.x+OX,me.y+OY,me.h],dest:me.state==='sailing'&&me.dest?me.dest:(s.loggedOut||s.loggingOut?this.parkDest:null)||null,at:me.at,vis:s.vis,disc:s.disc,loggedOut:s.loggedOut||s.loggingOut,likes:s.likes,friends:s.friends,convos:s.convos,unread:s.unread,blocked:s.blocked,wxMode:s.wxMode,wxWind:s.wxWind,fleet:s.fleet,marine:s.marine,notif:s.notif,sfx:s.sfx,todMode:s.todMode,pins:s.pins,voy:s.voy,gfx:s.gfx}))}catch(e){}}
 
   goDest(d){if(!d)return;const me=this.boatsById.me;const r=this.route(me.x,me.y,d.x,d.y);if(r){this.sendBoat(me,r,d.name,d.isl);this.follow='me';this.buoy={x:me.dest.x,y:me.dest.y,t0:this.t}}}
   like(id){const on=!this.state.likes[id];this.setState(s=>({likes:{...s.likes,[id]:on}}));if(on)this.toast(`You liked ${BY[id].name.split(' ')[0]}'s profile.`)}
@@ -2241,7 +2471,8 @@ class Component extends DCLogic {
   pv(id){const d=BY[id];if(!d)return null;const s=this.state,b=this.boatsById&&this.boatsById[id];const fs=s.friends[id]||'none',liked=!!s.likes[id];let label,col;
     if(d.presence==='parked'){label=`Parked${b&&b.at?' at '+b.at:''} · last seen ${d.seen} ago`;col='#9aa7ad'}else if(d.presence==='away'){label='Away · anchored';col='#f2c14e'}else if(b&&b.state==='sailing'&&b.dest){label=b.dest.name==='Open water'?'Online · sailing open water':`Online · sailing to ${b.dest.name}`;col='#5fd4c4'}else{label=`Online · anchored${b&&b.at?' near '+b.at:''}`;col='#5fd4c4'}
     const fN=d.friendsN+(fs==='friends'?1:0);const emotes=[['👋','Wave'],['⚓','Drop anchor nearby'],['🐬','Dolphins spotted'],['📯','Sound your horn']].map(([icon,label])=>({icon,label,send:()=>this.hail(id,icon)}));
-    return{emotes,friendCount:String(fN),friendCountLabel:fN+' friends',postCount:String(d.media.length),id,name:d.name,first:d.name.split(' ')[0],handle:'@'+d.handle,initials:ini(d.name),color:d.color,bio:d.bio,quote:d.quote,statusLabel:label,statusColor:col,boat:TYPES[d.type].label,
+    const vx=this.voy?this.voy.profileExtras(id):{};
+    return{...vx,emotes,friendCount:String(fN),friendCountLabel:fN+' friends',postCount:String(d.media.length),id,name:d.name,first:d.name.split(' ')[0],handle:'@'+d.handle,initials:ini(d.name),color:d.color,bio:d.bio,quote:d.quote,statusLabel:label,statusColor:col,boat:TYPES[d.type].label,
       likeCount:String(d.likes+(liked?1:0)),likeBg:liked?'rgba(255,122,89,.16)':'transparent',likeFill:liked?'#ff7a59':'none',likeStroke:liked?'#ff7a59':'#f4efe6',
       friendLabel:{none:'Add friend',requested:'Requested',friends:'Friends ✓',incoming:'Accept request',declined:'Add friend'}[fs],friendOpacity:fs==='requested'?.6:1,friendBg:fs==='friends'?'rgba(95,212,196,.16)':(fs==='incoming'?'rgba(95,212,196,.22)':'transparent'),
       hasStory:d.stories.length>0,storyRing:d.stories.length?'0 0 0 2px #0f2630, 0 0 0 4px #ff7a59':'none',
@@ -2262,6 +2493,7 @@ class Component extends DCLogic {
     if(ql)for(const r of (s.mbRes||[]))res.push({label:r.name,sub:r.sub+' · set course',mark:r.mark,color:'#cfe9ee',radius:'10px',pick:()=>{this.setState({searchOpen:false,q:'',mbRes:[]});const g=ll2w(r.lon,r.lat);this.setDest(g[0]-OX,g[1]-OY,r.name);this.follow='me'}});
     for(const isl of (this.islands||[]))for(const ct of (isl.cities||[]))if(ql&&ct.name.toLowerCase().includes(ql))res.push({label:ct.name,sub:`City · ${isl.name} · set course`,mark:ct.name[0],color:'#cfe9ee',radius:'10px',pick:()=>{this.setState({searchOpen:false,q:''});this.setDest(isl.cx,isl.cy)}});
     for(const pp of PEOPLE)if(!s.blocked[pp.id]&&(!ql||pp.name.toLowerCase().includes(ql)||pp.handle.includes(ql)))res.push({label:pp.name,sub:`@${pp.handle} · demo traveller`,mark:ini(pp.name),color:pp.color,radius:'50%',pick:()=>{this.setState({searchOpen:false,q:''});this.select(pp.id)}});
+    if(this.voy&&ql)res.unshift(...this.voy.searchRows(ql));
     const results=ql?res:res.slice(0,5).concat(res.filter(r=>r.radius==='50%').slice(0,5));
     const me=this.boatsById&&this.boatsById.me;
     const nearList=s.nearIds.map(id=>{const b=this.boatsById[id];return{first:BY[id].name.split(' ')[0],initials:ini(BY[id].name),color:BY[id].color,dist:`${(Math.hypot(b.x-me.x,b.y-me.y)*5/1000).toFixed(1)} km`,pick:()=>this.select(id)}});
@@ -2325,7 +2557,7 @@ class Component extends DCLogic {
           sendComment:e=>{e.preventDefault();const txt=this.state.cDraft.trim();if(!txt)return;this.setState(x=>({cDraft:'',mComments:{...x.mComments,[k]:[...(x.mComments[k]||[]),{text:txt,ts:Date.now()}]}}))}}})(),vBg:vm?vm.bg:'',vCaption:vm?vm.caption:'',vKindLabel:vm?(vm.video?'Video placeholder':'Photo placeholder'):'',vPos:vm?`${v.idx+1} / ${vd.media.length}`:'',
       vPlaying:!!(v&&v.playing),vPaused:!(v&&v.playing),vProg:v?Math.round(v.prog*100)+'%':'0%',vTime:vm?`${fmtT(v.prog*vm.secs)} / ${vm.dur}`:'',vPlay:()=>{const x=this.state.viewer;if(!x)return;const restart=x.prog>=1;this.setState({viewer:{...x,playing:!x.playing,prog:restart?0:x.prog}},()=>{if(this.state.viewer.playing)this.runViewer()})},
       sSegs:v&&v.kind==='story'?vd.stories.map((_,i)=>({w:i<v.idx?'100%':i===v.idx?Math.round(v.prog*100)+'%':'0%'})):[],sText:v&&v.kind==='story'?vd.stories[v.idx].t:'',sAge:v&&v.kind==='story'?vd.stories[v.idx].age:'',sName:vd?vd.name:'',sInitials:vd?ini(vd.name):'',sColor:vd?vd.color:'#f4efe6',
-      ...this.fleetVals(),...this.unlockVals(),...(this.ocean?this.ocean.vals():{showOInsp:false,showJournal:false,oRef:this.oRef,openJournal:()=>{},closeJournal:()=>{}}),...this.cosVals(),...this.bottleVals(),...this.photoVals(),...this.authVals(),welcomeRows:[['Sail anywhere','Tap the water to set a course. Your boat finds a route around the islands.'],['Discover nearby boats','Sailors within hailing distance appear as you pass. Tap a boat to say hi.'],['View profiles','Every boat carries a person: their photos, stories and status.'],['Make friends','Send a friend request, then chat from your inbox.'],['Grow your fleet','Finish a voyage every day to build your streak and unlock 23 more boats.']].map((r,i)=>({n:String(i+1),t:r[0],s:r[1]})),...this.marineVals(),hasMb:!!s.mb,mbText:s.mb||'',hasToast:!!s.toast,toastText:s.toast?s.toast.text:'',hasToastAction:!!(s.toast&&s.toast.action),toastActionLabel:s.toast&&s.toast.action?s.toast.action.label:'',toastAction:()=>{const a=s.toast&&s.toast.action;this.setState({toast:null});a&&a.fn()}}}
+      ...this.fleetVals(),...this.unlockVals(),...(this.voy?this.voy.vals():{}),...(this.ocean?this.ocean.vals():{showOInsp:false,showJournal:false,oRef:this.oRef,openJournal:()=>{},closeJournal:()=>{}}),...this.cosVals(),...this.bottleVals(),...this.photoVals(),...this.authVals(),welcomeRows:[['Sail anywhere','Tap the water to set a course. Your boat finds a route around the islands.'],['Discover nearby boats','Sailors within hailing distance appear as you pass. Tap a boat to say hi.'],['View profiles','Every boat carries a person: their photos, stories and status.'],['Make friends','Send a friend request, then chat from your inbox.'],['Grow your fleet','Finish a voyage every day to build your streak and unlock 23 more boats.']].map((r,i)=>({n:String(i+1),t:r[0],s:r[1]})),...this.marineVals(),hasMb:!!s.mb,mbText:s.mb||'',hasToast:!!s.toast,toastText:s.toast?s.toast.text:'',hasToastAction:!!(s.toast&&s.toast.action),toastActionLabel:s.toast&&s.toast.action?s.toast.action.label:'',toastAction:()=>{const a=s.toast&&s.toast.action;this.setState({toast:null});a&&a.fn()}}}
 }
 </script>
 </body>
