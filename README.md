@@ -203,3 +203,13 @@ There are no raster assets; everything is drawn on a canvas or with inline SVG i
 - **Vercel:** import the repo with Framework Preset "Other" and no build command. Set `MAPBOX_TOKEN` (and optionally `SUPABASE_ANON_KEY`) in Project Settings → Environment Variables, then redeploy. `api/config.js` serves them as `/config.js` (see `vercel.json`).
 - With `SUPABASE_ANON_KEY` set, the app leaves demo mode and uses Supabase, so run the backend setup above first, and add your Vercel domain to Supabase Auth → URL Configuration.
 - The browser needs to reach unpkg.com, cdn.jsdelivr.net, api.mapbox.com, fonts.googleapis.com and api.open-meteo.com.
+
+## Additions since the handoff
+- **Sea:** sun glitter and moon path, rolling swell bands, caustics in the shallows, shore foam that washes in and out, wind-driven whitecaps, glowing wakes and fish at night.
+- **Boats:** pennants that stream with the wind, red/green side lights and lanterns at night, rarity looks (Rare sail stripe, Epic gold trim, Legendary glow and golden wake), boat names on the stern when zoomed in, rocking at anchor, sails that luff head-to-wind, hull styles (Classic, Painted, Two-tone, Striped) with a trim colour.
+- **Animation:** arrival celebration (splash, bell, rings, "+1 voyage", fleet pill glow), full-screen unlock reveal, drop-in destination buoy, launch splash, rolling streak numbers.
+- **Fun:** hail nearby boats (wave, anchor, dolphin, horn), messages in bottles, photo mode with postcard export, whale breaches, dolphins racing the bow, gulls following you out of port, fish scattering when you tap the water.
+- **Sound:** sound effects and vibration (on by default, toggle in settings); ocean sound now adds lapping waves and creaks.
+- **Colour:** live time and weather by default, a golden-hour welcome screen, warmer dawn and dusk, rarity colours in My Fleet.
+- **Messages in bottles** use the `bottles` and `bottle_reports` tables plus the `random_bottles` RPC (bottom of `supabase/schema.sql`). Without them the app falls back to demo notes.
+- Add `?debug` to the URL to expose the app as `window.__sailo` for testing.

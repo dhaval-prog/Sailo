@@ -214,3 +214,72 @@ create policy "avatar update own folder" on storage.objects for update to authen
 drop policy if exists "avatar delete own folder" on storage.objects;
 create policy "avatar delete own folder" on storage.objects for delete to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ── Messages in bottles ───────────────────────────────────────────────────
+-- Short public notes that drift past other sailors. Hidden after 3 reports.
+create table if not exists public.bottles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  author_name text not null default 'A sailor',
+  body text not null check (char_length(btrim(body)) between 1 and 280),
+  reports int not null default 0,
+  created_at timestamptz not null default now()
+);
+create index if not exists bottles_created_idx on public.bottles(created_at desc);
+create table if not exists public.bottle_reports (
+  bottle_id uuid not null references public.bottles(id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (bottle_id, user_id)
+);
+alter table public.bottles enable row level security;
+alter table public.bottle_reports enable row level security;
+
+-- Author name comes from the profile, never the client; one bottle per 5 minutes.
+create or replace function public.bottles_before_insert() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.user_id := auth.uid();
+  new.reports := 0;
+  new.created_at := now();
+  new.author_name := coalesce((select left(display_name, 40) from profiles where id = new.user_id), 'A sailor');
+  if exists (select 1 from bottles where user_id = new.user_id and created_at > now() - interval '5 minutes') then
+    raise exception 'bottle_rate_limited' using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+drop trigger if exists bottles_before_insert on public.bottles;
+create trigger bottles_before_insert before insert on public.bottles for each row execute function public.bottles_before_insert();
+
+create or replace function public.bottle_reported() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  update bottles set reports = reports + 1 where id = new.bottle_id;
+  return new;
+end $$;
+drop trigger if exists bottle_reported on public.bottle_reports;
+create trigger bottle_reported after insert on public.bottle_reports for each row execute function public.bottle_reported();
+
+drop policy if exists "bottles readable" on public.bottles;
+create policy "bottles readable" on public.bottles for select to authenticated using (reports < 3 or user_id = auth.uid());
+drop policy if exists "throw own bottle" on public.bottles;
+create policy "throw own bottle" on public.bottles for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "delete own bottle" on public.bottles;
+create policy "delete own bottle" on public.bottles for delete to authenticated using (user_id = auth.uid());
+drop policy if exists "report once" on public.bottle_reports;
+create policy "report once" on public.bottle_reports for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "own reports" on public.bottle_reports;
+create policy "own reports" on public.bottle_reports for select to authenticated using (user_id = auth.uid());
+
+-- A few random bottles written by other sailors.
+create or replace function public.random_bottles(n int default 5) returns setof public.bottles
+language sql volatile security invoker set search_path = public as $$
+  select * from bottles where user_id <> auth.uid() and reports < 3
+  order by random() limit least(greatest(n, 1), 20);
+$$;
+revoke execute on function public.random_bottles(int) from anon, public;
+grant execute on function public.random_bottles(int) to authenticated;
+-- Trigger functions are not meant to be called over the API.
+revoke execute on function public.bottles_before_insert() from anon, authenticated, public;
+revoke execute on function public.bottle_reported() from anon, authenticated, public;
+revoke execute on function public.handle_new_user() from anon, authenticated, public;
